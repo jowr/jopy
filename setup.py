@@ -24,7 +24,7 @@ history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 setup(
     name='jopy',
     version='0.1.0',
-    description='My swiss army knife for plotting and simulation in Python',
+    description='My swiss army knife for plotting and Modelica simulations in Python',
     long_description=readme + '\n\n' + doclink + '\n\n' + history,
     author='Jorrit Wronski',
     author_email='jopy@jorrit.org',

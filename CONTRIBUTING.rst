@@ -37,8 +37,7 @@ Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
 Jorrit's Python Package could always use more documentation, whether as part of the 
-official Jorrit's Python Package docs, in docstrings, or even on the web in blog posts,
-articles, and such.
+official docs, in docstrings, or even on the web in blog posts, articles, and such.
 
 Submit Feedback
 ~~~~~~~~~~~~~~~
