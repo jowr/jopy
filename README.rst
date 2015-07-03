@@ -12,6 +12,14 @@ Jorrit's Python Package
 .. image:: https://travis-ci.org/jowr/jopy.png?branch=master
     :target: https://travis-ci.org/jowr/jopy
     :alt: Travis CI builds
+    
+.. image:: https://codecov.io/github/jowr/jopy?branch=master
+    :target: https://codecov.io/github/jowr/jopy
+    :alt: codecov.io
+
+.. image:: https://coveralls.io/repos/jowr/jopy/badge.svg
+    :target: https://coveralls.io/r/jowr/jopy
+    :alt: coveralls.io
 
 .. image:: https://readthedocs.org/projects/jopy/badge/?version=latest
     :target: https://readthedocs.org/projects/jopy/
