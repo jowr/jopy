@@ -13,6 +13,10 @@ Jorrit's Python Package
     :target: https://travis-ci.org/jowr/jopy
     :alt: Travis CI builds
 
+.. image:: https://readthedocs.org/projects/jopy/badge/?version=latest
+    :target: https://readthedocs.org/projects/jopy/
+    :alt: ReadTheDocs builds
+
 .. image:: https://img.shields.io/github/license/jowr/jopy.svg
     :target: https://github.com/jowr/jopy/blob/master/LICENSE
     :alt: license
