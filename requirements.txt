@@ -1,6 +1,4 @@
+# Other requirements in .travis.yml
 wheel>=0.22
-numpy
-scipy
-matplotlib
-pandas
+coolprop
 texttable
