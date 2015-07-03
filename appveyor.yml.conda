@@ -34,8 +34,6 @@ init:
   - C:\Miniconda\Scripts\conda update conda
   - C:\Miniconda\Scripts\conda install -c conda pytest requests conda-env --quiet
   - ps: if($env:PYTHON -eq "2.7"){C:\Miniconda\Scripts\conda install ndg-httpsclient}
-  # Other packages
-  - C:\Miniconda\Scripts\conda install -n conda atlas numpy scipy matplotlib nose dateutil pandas statsmodels pip --quiet
 
 install:
   - C:\Miniconda\python.exe setup.py install
