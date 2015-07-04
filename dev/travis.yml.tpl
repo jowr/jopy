@@ -45,7 +45,7 @@ before_install:
 # Install packages
 install:
   - source activate condaenv
-  - conda install -yq {{ cus_pkgs }}
+  - conda install -yq atlas {{ cus_pkgs }}
   #- conda install -yq -c coolprop coolprop
   - pip install {{ pip_pkgs }}
   - python setup.py install

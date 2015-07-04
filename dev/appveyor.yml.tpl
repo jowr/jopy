@@ -32,7 +32,7 @@ init:
 
 install:
   - cmd: activate condaenv
-  - cmd: conda install -yq {{ cus_pkgs }}
+  - cmd: conda install -yq unxutils {{ cus_pkgs }}
   #- cmd: conda install -yq -c coolprop coolprop
   - cmd: pip install {{ pip_pkgs }}
   - cmd: python setup.py install

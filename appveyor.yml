@@ -32,7 +32,7 @@ init:
 
 install:
   - cmd: activate condaenv
-  - cmd: conda install -yq pip jinja2 atlas numpy scipy matplotlib nose dateutil pandas statsmodels pytest cython
+  - cmd: conda install -yq unxutils pip jinja2 numpy scipy matplotlib nose dateutil pandas statsmodels pytest cython
   #- cmd: conda install -yq -c coolprop coolprop
   - cmd: pip install coveralls nose-cov codecov coolprop texttable
   - cmd: python setup.py install
