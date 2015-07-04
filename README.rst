@@ -17,7 +17,7 @@ Jorrit's Python Package
     :target: https://ci.appveyor.com/project/jowr/jopy/branch/master
     :alt: AppVeyor Windows builds
     
-.. image:: https://codecov.io/github/jowr/jopy?branch=master
+.. image:: https://codecov.io/github/jowr/jopy/coverage.svg?branch=master
     :target: https://codecov.io/github/jowr/jopy
     :alt: codecov.io
 
