@@ -25,6 +25,32 @@ Features
 * TODO
 
 
+Installation
+------------
+
+
+
+CI servers and automated builds
+-------------------------------
+
+If yo add a package to the dependencies
+
+These steps help you prepare an environment to run the Python package.
+
+
+
+conda create -n jopy python=2 pip cython numpy scipy pandas matplotlib ipython-notebook
+
+
+
+conda install -c conda conda-env
+
+name: stats
+dependencies:
+  - numpy
+  - pandas
+  
+  
 
 .. |pypirelease| image:: https://badge.fury.io/py/jopy.png
     :target: http://badge.fury.io/py/jopy

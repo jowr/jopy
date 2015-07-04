@@ -1,9 +1,9 @@
 package:
   name: jopy
-  version: 5.1.0
+  version: {{ version }}
 
 source:
-  git_tag: v5.1.0
+  git_tag: {{ tag }}
   git_url: https://github.com/jowr/jopy.git
 
   # If this is a new build for the same version, increment the build
@@ -13,14 +13,14 @@ source:
 requirements:
   build:
     - python
-    - setuptools
-    - numpy
-    - matplotlib
+    - setuptools{% for pkg in pkgs %}
+    - {{ pkg -}}
+{% endfor %}
 
   run:
-    - python
-    - numpy
-    - matplotlib
+    - python{% for pkg in pkgs %}
+    - {{ pkg -}}
+{% endfor %}
 
 #test:
   # Python imports

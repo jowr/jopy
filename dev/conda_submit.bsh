@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+#
+# Temporary install of miniconda for Python 2
+#wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
+#bash Miniconda-latest-Linux-x86_64.sh
+#
+# conda install unxutils # needed on Windows!
+# Activate conda
+CONDA_ROOT=`conda info --root`
+source ${CONDA_ROOT}/bin/activate root
+CMD="${CONDA_ROOT}/bin/conda install conda-env conda-build binstar binstar-build jinja2"
+
+$CMD
+if [ $? -eq 0 ] ; then
+    echo "Command succeeded"
+else
+    echo "Command failed, trying with sudo"
+    sudo $CMD
+    if [ $? -eq 0 ] ; then
+        echo "Command succeeded"
+    else
+        echo "Command failed with sudo as well, aborting."
+        exit 1
+    fi
+fi
+
+pushd ..
+conda build --py all . 
+#binstar login
+mkdir -p build
+for FILENAME in $(conda build --output --py all coolprop); do
+    conda convert --platform all "${FILENAME}" -o build/
+done
+binstar upload --channel dev build/*
+#rm -rf build
+popd
+
+#binstar login
+#binstar upload $(conda build --output --py all coolprop)
+
+exit 0
