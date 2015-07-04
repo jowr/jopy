@@ -30,7 +30,7 @@ before_install:
   - ./miniconda.sh -b
   - export PATH=/home/travis/miniconda/bin:$PATH
   - conda update -yq conda
-  - conda install conda-env conda-build binstar binstar-build jinja2
+  - conda install -yq {{ bas_pkgs }}
   - conda create -yq -n condaenv python=$TRAVIS_PYTHON_VERSION
   # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
   - sudo rm -rf /dev/shm
@@ -39,10 +39,9 @@ before_install:
 # Install packages
 install:
   - source activate condaenv
-  - conda install -yq pip atlas numpy scipy matplotlib nose dateutil pandas statsmodels pytest cython
-  # Coverage packages are on my binstar channel
-  #- conda install --yes -c dan_blanchard python-coveralls nose-cov
-  - pip install coveralls nose-cov codecov coolprop texttable
+  - conda install -yq {{ cus_pkgs }}
+  #- conda install -yq -c coolprop coolprop
+  - pip install {{ pip_pkgs }}
   - python setup.py install
  
 # Run test
@@ -53,9 +52,4 @@ script:
 after_success:
   - coveralls
   - codecov
-  
-  
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose dateutil pandas statsmodels
-  # Coverage packages are on my binstar channel
-  - conda install --yes -c dan_blanchard python-coveralls nose-cov
-  - python setup.py install
+
