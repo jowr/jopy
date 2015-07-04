@@ -6,9 +6,10 @@ python:
   - "3.4"
   - "3.3"
   - "2.7"
-  - "2.6"
-  
-#  - "pypy"
+
+#env:
+#  -
+#  - PYCOSAT=0.6.0
 
 ## command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 #install: 
@@ -20,15 +21,20 @@ python:
 
 notifications:
   email: false
- 
+
 # Update system and install miniconda, fill in the rest via pip
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -q -y gfortran libhdf5-serial-dev libnetcdf-dev liblapack-dev libatlas-dev
-  - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+      wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
+    else
+      wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+    fi
   - chmod +x miniconda.sh
   - ./miniconda.sh -b
-  - export PATH=/home/travis/miniconda/bin:$PATH
+  #- export PATH=/home/travis/miniconda/bin:$PATH
+  - source /home/travis/miniconda/bin/activate root
   - conda update -yq conda
   - conda install -yq conda-env conda-build binstar binstar-build jinja2
   - conda create -yq -n condaenv python=$TRAVIS_PYTHON_VERSION

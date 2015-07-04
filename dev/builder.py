@@ -21,6 +21,25 @@ f = codecs.open(os.path.join(target_dir,"."+target),mode='wb',encoding='utf-8')
 f.write(template.render(bas_pkgs=" ".join(bas_pkgs), cus_pkgs=" ".join(cus_pkgs), pip_pkgs=" ".join(pip_pkgs)))
 f.close()
 
+tags = {}
+#r = requests.get('https://api.github.com/repos/coolprop/coolprop/tags')
+r = requests.get('https://api.github.com/repos/jowr/jopy/tags')
+if(r.ok):
+    item = json.loads(r.text or r.content)
+    for com in item:
+        tags[com['name']] = com['commit']['sha']
+
+#tag = sorted(tags.keys())[-1]
+tag = "v0.0.1"
+if tag[0]=='v': version = tag[1:]
+else: version = tag
+
+target = 'appveyor.yml'
+template = environment.get_template(os.path.join(template_dir,target+'.tpl'))
+f = codecs.open(os.path.join(target_dir,target),mode='wb',encoding='utf-8')
+f.write(template.render(version=version, bas_pkgs=" ".join(bas_pkgs), cus_pkgs=" ".join(cus_pkgs), pip_pkgs=" ".join(pip_pkgs)))
+f.close()
+
 #target = 'meta.yaml'
 #template = environment.get_template(os.path.join(template_dir,target+'.tpl'))
 #tags = {}

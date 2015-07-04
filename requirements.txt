@@ -1,4 +1,0 @@
-# Other requirements in .travis.yml
-wheel>=0.22
-coolprop
-texttable

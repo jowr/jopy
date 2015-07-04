@@ -1,16 +1,14 @@
+
+version: {{ version }}.{build}
+
 # Tell appveyor to not use msbuild
 build: false
 
 environment:
   matrix:
     - PYTHON: 2.7
-      PYCOSAT: 0.6.0
-    - PYTHON: 2.7
-      PYCOSAT:
+    - PYTHON: 3.3
     - PYTHON: 3.4
-      PYCOSAT: 0.6.0
-    - PYTHON: 3.4
-      PYCOSAT:
 
 platform:
   - x86
@@ -18,31 +16,25 @@ platform:
 
 init:
   - "ECHO %PYTHON%"
-  - "ECHO %PYCOSAT%"
-  - ps: if($env:PYTHON -eq "2.7" -and $env:Platform -eq "x64" -and $env:PYCOSAT -ne "0.6.0"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda-3.5.5-Windows-x86_64.exe' C:\Miniconda.exe; echo "Done"}
-  - ps: if($env:PYTHON -eq "2.7" -and $env:Platform -eq "x64" -and $env:PYCOSAT -eq "0.6.0"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda-3.4.2-Windows-x86_64.exe' C:\Miniconda.exe; echo "Done"}
-  - ps: if($env:PYTHON -eq "2.7" -and $env:Platform -eq "x86" -and $env:PYCOSAT -ne "0.6.0"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda-3.5.5-Windows-x86.exe' C:\Miniconda.exe; echo "Done"}
-  - ps: if($env:PYTHON -eq "2.7" -and $env:Platform -eq "x86" -and $env:PYCOSAT -eq "0.6.0"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda-3.4.2-Windows-x86.exe' C:\Miniconda.exe; echo "Done"}
-  - ps: if($env:PYTHON -eq "3.4" -and $env:Platform -eq "x64" -and $env:PYCOSAT -ne "0.6.0"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda3-3.5.5-Windows-x86_64.exe' C:\Miniconda.exe; echo "Done"}
-  - ps: if($env:PYTHON -eq "3.4" -and $env:Platform -eq "x64" -and $env:PYCOSAT -eq "0.6.0"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda3-3.4.2-Windows-x86_64.exe' C:\Miniconda.exe; echo "Done"}
-  - ps: if($env:PYTHON -eq "3.4" -and $env:Platform -eq "x86" -and $env:PYCOSAT -ne "0.6.0"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda3-3.5.5-Windows-x86.exe' C:\Miniconda.exe; echo "Done"}
-  - ps: if($env:PYTHON -eq "3.4" -and $env:Platform -eq "x86" -and $env:PYCOSAT -eq "0.6.0"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda3-3.4.2-Windows-x86.exe' C:\Miniconda.exe; echo "Done"}
-  - cmd: C:\Miniconda.exe /S /D=C:\Miniconda
-  - ps: ls C:\Miniconda/Scripts
+  - ps: if($env:PYTHON -eq "2.7" -and $env:Platform -eq "x64"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda-latest-Windows-x86_64.exe' C:\Miniconda.exe; echo "Done"}
+  - ps: if($env:PYTHON -eq "2.7" -and $env:Platform -eq "x86"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda-latest-Windows-x86.exe' C:\Miniconda.exe; echo "Done"}
+  - ps: if($env:PYTHON -eq "3.3" -and $env:Platform -eq "x64"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda3-latest-Windows-x86_64.exe' C:\Miniconda.exe; echo "Done"}
+  - ps: if($env:PYTHON -eq "3.3" -and $env:Platform -eq "x86"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda3-latest-Windows-x86.exe' C:\Miniconda.exe; echo "Done"}
+  - ps: if($env:PYTHON -eq "3.4" -and $env:Platform -eq "x64"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda3-latest-Windows-x86_64.exe' C:\Miniconda.exe; echo "Done"}
+  - ps: if($env:PYTHON -eq "3.4" -and $env:Platform -eq "x86"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda3-latest-Windows-x86.exe' C:\Miniconda.exe; echo "Done"}
+  - "C:\Miniconda.exe /S /D=C:\Miniconda"
+  - "C:\Miniconda\Scripts\activate.bat root"
   # We need to do this first as other commands may not work with older versions of conda.
-  - C:\Miniconda\Scripts\conda update -yq conda
-  - C:\Miniconda\Scripts\conda install -yq -c conda pytest requests conda-env
-  - ps: if($env:PYTHON -eq "2.7"){C:\Miniconda\Scripts\conda install -yq ndg-httpsclient}
-  # Other packages
-  - C:\Miniconda\Scripts\conda install -n conda atlas numpy scipy matplotlib nose dateutil pandas statsmodels pip --quiet
+  - "conda update -yq conda"
+  - "conda install -yq {{ bas_pkgs }}"
+  - "conda create -yq -n condaenv python=%PYTHON%"
 
 install:
-
-
-  - C:\Miniconda\python.exe setup.py install
-  - C:\Miniconda\Scripts\conda info -a
-  - C:\Miniconda\Scripts\conda list
+  - "activate.bat condaenv"
+  - "conda install -yq {{ cus_pkgs }}"
+  #- "conda install -yq -c coolprop coolprop"
+  - "pip install {{ pip_pkgs }}"
+  - "python setup.py install"
 
 test_script:
-  - C:\Miniconda\Scripts\py.test -vvv
-  - IF %PYTHON%==2.7 IF DEFINED PYCOSAT C:\Miniconda\Scripts\conda install -f menuinst ipython-notebook & echo "Finished menuinst test"
+  - "nosetests --with-coverage --cover-package=jopy --logging-level=INFO"
