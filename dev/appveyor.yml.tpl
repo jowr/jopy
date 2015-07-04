@@ -24,18 +24,18 @@ init:
   - ps: if($env:PYTHON -eq "3.4" -and $env:Platform -eq "x86"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda3-latest-Windows-x86.exe' C:\Miniconda.exe; echo "Done"}
   - cmd: C:\Miniconda.exe /S /D=C:\Miniconda
   #- cmd: C:\Miniconda\Scripts\activate.bat root
-  - "SET PATH=C:\Miniconda\Scripts;%PATH%"
+  - cmd: SET PATH=C:\Miniconda\Scripts;%PATH%
   # We need to do this first as other commands may not work with older versions of conda.
-  - "conda update -yq conda"
-  - "conda install -yq {{ bas_pkgs }}"
-  - "conda create -yq -n condaenv python=%PYTHON%"
+  - cmd: conda update -yq conda
+  - cmd: conda install -yq {{ bas_pkgs }}
+  - cmd: conda create -yq -n condaenv python=%PYTHON%
 
 install:
-  - "activate condaenv"
-  - "conda install -yq {{ cus_pkgs }}"
-  #- "conda install -yq -c coolprop coolprop"
-  - "pip install {{ pip_pkgs }}"
-  - "python setup.py install"
+  - cmd: activate condaenv
+  - cmd: conda install -yq {{ cus_pkgs }}
+  #- cmd: conda install -yq -c coolprop coolprop
+  - cmd: pip install {{ pip_pkgs }}
+  - cmd: python setup.py install
 
 test_script:
-  - "nosetests --with-coverage --cover-package=jopy --logging-level=INFO"
+  - cmd: nosetests --with-coverage --cover-package=jopy --logging-level=INFO
