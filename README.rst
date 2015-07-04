@@ -11,7 +11,11 @@ Jorrit's Python Package
     
 .. image:: https://travis-ci.org/jowr/jopy.png?branch=master
     :target: https://travis-ci.org/jowr/jopy
-    :alt: Travis CI builds
+    :alt: Travis CI Linux builds
+    
+.. image:: https://ci.appveyor.com/api/projects/status/github/jowr/jopy?branch=master
+    :target: https://ci.appveyor.com/project/jowr/jopy/branch/master
+    :alt: AppVeyor Windows builds
     
 .. image:: https://codecov.io/github/jowr/jopy?branch=master
     :target: https://codecov.io/github/jowr/jopy
