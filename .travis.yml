@@ -45,7 +45,7 @@ before_install:
 # Install packages
 install:
   - source activate condaenv
-  - conda install -yq atlas pip jinja2 numpy scipy matplotlib nose dateutil pandas statsmodels pytest cython
+  - conda install -yq atlas pip jinja2 pyaml numpy scipy matplotlib nose dateutil pandas statsmodels pytest cython
   #- conda install -yq -c coolprop coolprop
   - pip install coveralls nose-cov codecov coolprop texttable
   - python setup.py install

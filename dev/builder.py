@@ -9,7 +9,7 @@ template_dir = os.path.dirname(__file__)
 target_dir = os.path.abspath(os.path.join(os.path.dirname(__file__),'..'))
 
 bas_pkgs = ["conda-env", "conda-build", "binstar", "binstar-build", "jinja2"]
-cus_pkgs = ["pip", "jinja2", "numpy", "scipy", "matplotlib", "nose", "dateutil", "pandas", "statsmodels", "pytest", "cython"]
+cus_pkgs = ["pip", "jinja2", "pyaml", "numpy", "scipy", "matplotlib", "nose", "dateutil", "pandas", "statsmodels", "pytest", "cython"]
 pip_pkgs = ["coveralls", "nose-cov", "codecov", "coolprop", "texttable"]
 
 loader = jinja2.FileSystemLoader(template_dir)
