@@ -4,7 +4,7 @@ Jorrit's Python Package
 =============================
 .. |pypirelease| - source |ghrelease|
 
-|travis| |coveralls| |docs| |license|
+|travis| |appveyor| |coveralls| |docs| |license|
 
 .. 
   Versions: binary |pypirelease| - source |ghrelease|
@@ -28,29 +28,9 @@ Features
 Installation
 ------------
 
+For Linux, you can find up to date instructions in `.travis.yml` and `appveyor.yml` can be used for Windows hosts.
 
 
-CI servers and automated builds
--------------------------------
-
-If yo add a package to the dependencies
-
-These steps help you prepare an environment to run the Python package.
-
-
-
-conda create -n jopy python=2 pip cython numpy scipy pandas matplotlib ipython-notebook
-
-
-
-conda install -c conda conda-env
-
-name: stats
-dependencies:
-  - numpy
-  - pandas
-  
-  
 
 .. |pypirelease| image:: https://badge.fury.io/py/jopy.png
     :target: http://badge.fury.io/py/jopy
