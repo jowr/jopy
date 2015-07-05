@@ -33,8 +33,8 @@ before_install:
     fi
   - chmod +x miniconda.sh
   - ./miniconda.sh -b
-  #- export PATH=/home/travis/miniconda/bin:$PATH
-  - source /home/travis/miniconda/bin/activate root
+  - export PATH=/home/travis/miniconda/bin:$PATH
+  #- source /home/travis/miniconda/bin/activate root
   - conda update -yq conda
   - conda install -yq conda-env conda-build binstar binstar-build jinja2
   - conda create -yq -n condaenv python=$TRAVIS_PYTHON_VERSION
