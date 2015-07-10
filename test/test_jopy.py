@@ -3,6 +3,7 @@ Tests for `jopy` module.
 """
 import pytest
 from jopy import jopy
+from jopy.recip import RecipMachine, RecipMachineAlt
 
 
 class TestJopy(object):
@@ -13,6 +14,22 @@ class TestJopy(object):
 
     def test_something(self):
         pass
+
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+class TestJopyRecip(object):
+
+    @classmethod
+    def setup_class(cls):
+        pass
+
+    def test_something(self):
+        obj = RecipMachine()
+        alt = RecipMachineAlt()
+        assert not isinstance(obj, RecipMachineAlt)
+        assert isinstance(alt, RecipMachine)
 
     @classmethod
     def teardown_class(cls):
