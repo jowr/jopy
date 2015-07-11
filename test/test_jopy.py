@@ -1,8 +1,6 @@
 """
 Tests for `jopy` module.
 """
-import pytest
-from jopy import jopy
 from jopy.recip import RecipMachine, RecipMachineAlt
 
 

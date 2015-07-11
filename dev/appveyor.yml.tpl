@@ -1,4 +1,3 @@
-
 version: {{ version }}.{build}
 
 # Tell appveyor to not use msbuild

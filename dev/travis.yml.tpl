@@ -1,4 +1,3 @@
-
 # Config file for automatic testing at travis-ci.org
 
 language: python

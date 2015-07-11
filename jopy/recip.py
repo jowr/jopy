@@ -3,13 +3,15 @@ Created on 10 Apr 2013
 
 @author: jowr
 '''
+from __future__ import print_function, division
+
 import numpy as np
 from scipy.constants.constants import pi
 from numpy.core.numeric import infty
 from texttable import Texttable
-from jopy.base_classes import JopyBaseClass
 from scipy.optimize._minimize import minimize_scalar
 
+from .base import JopyBaseClass
 
 class RecipMachine(JopyBaseClass):
     def __init__(self):
@@ -158,8 +160,8 @@ class RecipMachine(JopyBaseClass):
     
         
     def info(self):
-        print "Definition of piston movement and formulae taken "
-        print "Dubbel, pages P5 to P7"
+        print("Definition of piston movement and formulae taken ")
+        print("Dubbel, pages P5 to P7")
         
         table = Texttable()
         table.set_deco(Texttable.HEADER)
@@ -184,7 +186,7 @@ class RecipMachine(JopyBaseClass):
         table.add_row(["Max Vol", self.volume(self.BDC())*1e6,"cm3","max volume at BDC"])
         table.add_row(["Min Vol", self.volume(self.TDC())*1e6,"cm3","min volume at TDC"])
         
-        print "\n"+table.draw()+"\n"
+        print("\n"+table.draw()+"\n")
         
     
     def revolution(self,num):
@@ -213,8 +215,8 @@ class RecipMachine(JopyBaseClass):
             axs[0].plot(rev[iMax]*180/pi,self._position(rev[iMax])*100,'o')
             axs[0].set_ylabel(r'Piston position (cm)')
             ax = axs[1]
-            print "Position: ", str(pos.min()), str(pos.max()), str(self.stroke())
-            print "Volume:    ",str(volu.min()), str(volu.max())
+            print("Position: ", str(pos.min()), str(pos.max()), str(self.stroke()))
+            print("Volume:    ",str(volu.min()), str(volu.max()))
         else:
             fig, ax = plt.subplots(1, 1)
             

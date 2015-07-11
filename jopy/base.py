@@ -3,6 +3,8 @@ Created on 3 Apr 2014
 
 @author: jowr
 '''
+from __future__ import print_function, division
+
 class JopyBaseClass(object):     
     def __init__(self):
         """The mother of all classes in the jopy 
@@ -35,4 +37,4 @@ class JopyBaseClass(object):
         # Dump the message + the name of this function to the log.
         logging.debug(msg)
         if self.DEBUG:
-            print msg
+            print(msg)
