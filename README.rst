@@ -39,11 +39,11 @@ For Linux, you can find up to date instructions in `.travis.yml` and `appveyor.y
     :target: https://github.com/jowr/jopy/releases
     :alt: version tag
     
-.. |travis| image:: https://travis-ci.org/jowr/jopy.png?branch=master
+.. |travis| image:: https://img.shields.io/travis/jowr/jopy.svg?label=Linux
     :target: https://travis-ci.org/jowr/jopy
     :alt: Travis CI Linux builds
     
-.. |appveyor| image:: https://ci.appveyor.com/api/projects/status/github/jowr/jopy?branch=master
+.. |appveyor| image:: https://img.shields.io/appveyor/ci/jowr/jopy.svg?label=Windows
     :target: https://ci.appveyor.com/project/jowr/jopy/branch/master
     :alt: AppVeyor Windows builds
     
