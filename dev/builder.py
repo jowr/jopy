@@ -22,8 +22,8 @@ bas_pkgs = ["conda-env", "conda-build", "binstar", "binstar-build", "jinja2"]
 cus_pkgs = ["numpy", "scipy", "matplotlib", "pandas"]
 pip_cus_pkgs = ["coolprop", "texttable"]
 
-dev_pkgs = cus_pkgs + ["pip", "pyyaml", "nose", "sphinx", "jinja2", "tox"]
-pip_dev_pkgs = pip_cus_pkgs + ["coveralls", "nose-cov", "codecov"]
+dev_pkgs = cus_pkgs + ["pip", "pyyaml", "nose", "sphinx", "jinja2"]
+pip_dev_pkgs = pip_cus_pkgs + ["coveralls", "nose-cov", "codecov", "tox"]
 
 os.chdir(template_dir)
 loader = jinja2.FileSystemLoader(['.','jopy'])
