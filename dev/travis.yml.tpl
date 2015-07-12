@@ -42,7 +42,7 @@ before_install:
   - export PATH=/home/travis/miniconda3/bin:/home/travis/miniconda/bin:$PATH
   #- source /home/travis/miniconda/bin/activate root
   - conda update -yq conda
-  - conda install -yq {{ bas_pkgs }}
+  - conda install -yq{% for pkg in bas_pkgs %} {{ pkg }}{% endfor %}
   - conda create -yq -n condaenv python=$TRAVIS_PYTHON_VERSION
   # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
   - sudo rm -rf /dev/shm
@@ -51,9 +51,10 @@ before_install:
 # Install packages
 install:
   - source activate condaenv
-  - conda install -yq atlas {{ cus_pkgs }}
+  - conda install -yq atlas{% for pkg in cus_pkgs %} {{ pkg }}{% endfor %}
   #- conda install -yq -c coolprop coolprop
-  - pip install {{ pip_pkgs }}
+  - pip install{% for pkg in pip_pkgs %} {{ pkg }}{% endfor %}
+  - pip install{% for pkg in dev_pkgs %} {{ pkg }}{% endfor %}
   - python setup.py install
  
 # Run test

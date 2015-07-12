@@ -26,15 +26,15 @@ init:
   - cmd: SET PATH=C:\Miniconda3\Scripts;C:\Miniconda\Scripts;%PATH%
   # We need to do this first as other commands may not work with older versions of conda.
   - cmd: conda update -yq conda
-  - cmd: conda install -yq {{ bas_pkgs }}
+  - cmd: conda install -yq{% for pkg in bas_pkgs %} {{ pkg }}{% endfor %}
   - cmd: conda create -yq -n condaenv python=%PYTHON%
 
 install:
   - cmd: activate condaenv
-  - cmd: conda install -yq unxutils {{ cus_pkgs }}
+  - cmd: conda install -yq unxutils{% for pkg in cus_pkgs %} {{ pkg }}{% endfor %}
   #- cmd: conda install -yq -c coolprop coolprop
-  - cmd: pip install {{ pip_pkgs }}
-  - cmd: pip install {{ dev_pkgs }}
+  - cmd: pip install{% for pkg in pip_pkgs %} {{ pkg }}{% endfor %}
+  - cmd: pip install{% for pkg in dev_pkgs %} {{ pkg }}{% endfor %}
   - cmd: python setup.py install
 
 test_script:

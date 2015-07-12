@@ -25,14 +25,6 @@ os.chdir(template_dir)
 loader = jinja2.FileSystemLoader(['.','jopy'])
 environment = jinja2.Environment(loader=loader)
 
-target = 'travis.yml'
-template_path = target+'.tpl'
-template = environment.get_template(template_path)
-f = codecs.open(os.path.join(target_dir,"."+target),mode='wb',encoding='utf-8')
-f.write(tpl_first_line.format("# "+mtime,template_path))
-f.write(template.render(bas_pkgs=" ".join(bas_pkgs), cus_pkgs=" ".join(cus_pkgs), pip_pkgs=" ".join(pip_pkgs)))
-f.close()
-
 tags = {}
 #r = requests.get('https://api.github.com/repos/coolprop/coolprop/tags')
 r = requests.get('https://api.github.com/repos/jowr/jopy/tags')
@@ -46,13 +38,20 @@ tag = "v0.0.1"
 if tag[0]=='v': version = tag[1:]
 else: version = tag
 
+target = 'travis.yml'
+template_path = target+'.tpl'
+template = environment.get_template(template_path)
+f = codecs.open(os.path.join(target_dir,"."+target),mode='wb',encoding='utf-8')
+f.write(tpl_first_line.format("# "+mtime,template_path))
+f.write(template.render(bas_pkgs=bas_pkgs, cus_pkgs=cus_pkgs, pip_pkgs=pip_pkgs, dev_pkgs=dev_pkgs))
+f.close()
 
 target = 'appveyor.yml'
 template_path = target+'.tpl'
 template = environment.get_template(template_path)
 f = codecs.open(os.path.join(target_dir,target),mode='wb',encoding='utf-8')
 f.write(tpl_first_line.format("# "+mtime,template_path))
-f.write(template.render(version=version, bas_pkgs=" ".join(bas_pkgs), cus_pkgs=" ".join(cus_pkgs), pip_pkgs=" ".join(pip_pkgs)))
+f.write(template.render(version=version, bas_pkgs=bas_pkgs, cus_pkgs=cus_pkgs, pip_pkgs=pip_pkgs, dev_pkgs=dev_pkgs))
 f.close()
 
 target = 'requirements.txt'
