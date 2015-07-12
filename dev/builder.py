@@ -6,6 +6,11 @@ from distutils.version import LooseVersion #, StrictVersion
 import codecs
 import datetime
 from jinja2.environment import Environment
+import subprocess
+import sys
+
+#import conda_api
+#import sys
 
 template_dir = os.path.dirname(os.path.abspath(__file__))
 target_dir = os.path.abspath(os.path.join(os.path.dirname(__file__),'..'))
@@ -24,6 +29,145 @@ pip_cus_pkgs = ["coolprop", "texttable"]
 
 dev_pkgs = cus_pkgs + ["pip", "pyyaml", "nose", "sphinx", "jinja2"]
 pip_dev_pkgs = pip_cus_pkgs + ["coveralls", "nose-cov", "codecov", "tox"]
+
+
+if sys.platform.lower().startswith('win'): 
+    #conda_api.set_root_prefix(r'C:\Miniconda3')
+    activa = r'C:\Miniconda3\Scripts\activate.bat'
+    source = ''
+else:
+    #conda_api.set_root_prefix(r'/opt/miniconda')
+    activa = r'source /opt/miniconda/bin/activate'
+    source = 'source'
+
+#print(str(conda_api.get_conda_version()))
+#print(str(conda_api.search(spec='ipython')))
+ 
+def run_command(cmd):
+    '''given shell command, returns communication tuple of stdout and stderr'''
+    return subprocess.Popen(cmd, 
+                            stdout=subprocess.PIPE, 
+                            stderr=subprocess.PIPE, 
+                            stdin=subprocess.PIPE).communicate()
+def find_packages(full):
+    """Searches binstar for packages"""
+    con_pkgs = []
+    pip_pkgs = []
+    for pkg in [f.lower() for f in full]:
+        res = run_command(['conda','search',pkg])[0].decode("utf-8").splitlines()
+        if len(res)>=2:
+            re = res[1].split()
+            #print(re)
+            if len(re)>0 and re[0]==pkg: 
+                print("Found {0} on binstar.".format(re[0]))
+                con_pkgs.append(pkg)
+            else:
+                pip_pkgs.append(pkg)
+        else:
+            pip_pkgs.append(pkg)
+    return con_pkgs
+            
+
+tmp_env = False #'tmpEnv'
+
+if tmp_env:
+    all_dev_pkgs = list(dev_pkgs + pip_dev_pkgs)
+    con_dev_pkgs = list(find_packages(all_dev_pkgs))
+    pip_dev_pkgs = list(set(all_dev_pkgs).difference(con_dev_pkgs))
+
+    all_cus_pkgs = list(cus_pkgs + pip_cus_pkgs)
+    con_cus_pkgs = list(set(all_cus_pkgs).intersection(con_dev_pkgs))
+    pip_cus_pkgs = list(set(all_cus_pkgs).difference(con_dev_pkgs))
+    
+    new_dev_pkgs = []
+    print(pip_dev_pkgs)
+    print(run_command(['conda','create','-yn',tmp_env,'pip','setuptools'])[0].decode("utf-8"))
+    print(run_command([activa,tmp_env,'&','pip','install']+list(pip_dev_pkgs))[0].decode("utf-8"))
+    for res in run_command([activa,tmp_env,'&','pip','freeze'])[0].decode("utf-8").splitlines():
+        re = res.split('==')
+        if len(re)==2: 
+            #print("New dependency: "+re[0])
+            new_dev_pkgs.append(re[0].lower())
+            
+    all_new_pkgs = list(set(new_dev_pkgs).difference(all_dev_pkgs))
+    con_new_pkgs = list(find_packages(all_new_pkgs))
+    pip_new_pkgs = list(set(all_new_pkgs).difference(con_new_pkgs))
+    
+    print("cus conda:"+' '.join(con_cus_pkgs))
+    print("dev conda:"+' '.join(con_dev_pkgs))
+    print("new conda:"+' '.join(con_new_pkgs))
+    print("  cus pip:"+' '.join(pip_cus_pkgs))
+    print("  dev pip:"+' '.join(pip_dev_pkgs))
+    print("  new pip:"+' '.join(pip_new_pkgs))
+    
+    print(run_command(['conda','remove','-y','--all',tmp_env])[0].decode("utf-8"))
+
+#     #{% if upload %}binstar login{% endif %}    
+#     tpl_string_start = """
+# conda create -n {{ env }} pip setuptools binstar
+# {{ source }}activate {{ env }}
+# {% if upload %}conda config --set binstar_upload yes{% endif %}
+# {% if not upload %}conda config --set binstar_upload no{% endif %}
+# {% for pkg in pip_pkgs %}
+# conda skeleton pypi {{ pkg }}
+# conda build --python all -c https://conda.binstar.org/jowr {{ pkg }}
+# """
+#     tpl_string_stop = """
+# {% endfor %}
+# {{ source }}deactivate
+# conda remove --all {{ env }}
+# conda config --set binstar_upload no
+# exit 0
+# """
+#     tpl_string_cent = """
+# {% if upload %}binstar upload `conda build --output --python all {{ pkg }}`{% endif %}
+# """
+    #{% if upload %}binstar login{% endif %}    
+    tpl_string = """
+conda create -n {{ env }} pip setuptools binstar
+{{ source }}activate {{ env }}
+{% if upload %}conda config --set binstar_upload yes{% endif %}
+{% if not upload %}conda config --set binstar_upload no{% endif %}
+{% for pkg in pip_pkgs %}
+conda skeleton pypi {{ pkg }}
+conda build --python all -c https://conda.binstar.org/jowr {{ pkg }}
+{% endfor %}
+{{ source }}deactivate
+conda remove --all {{ env }}
+conda config --set binstar_upload no
+exit 0
+"""
+    #binstar login
+    #conda skeleton pypi somepypipackage
+    #conda build somepypipackage
+    #binstar upload somepypipackage
+    #conda config --add channels jowr
+    #conda install --use-local option
+    
+    upload = True
+    
+    target = 'maintain_repo.bsh'
+    template =Environment().from_string(tpl_string)
+    f = codecs.open(os.path.join(target_dir,target),mode='wb',encoding='utf-8')
+    f.write(tpl_first_line.format("#!/bin/bash\n# "+mtime,'builder.py'))
+    f.write(template.render(env="tmpEnv",source="source ", upload=upload, pip_pkgs=pip_new_pkgs+pip_dev_pkgs))
+    f.close()
+
+#     tpl_string_cent = """
+# set nameValue=
+# for /f "delims=" %%a in ('conda build --output --python all {{ pkg }}') do @set nameValue=%%a
+# {% if upload %}binstar upload %nameValue% {% endif %}
+# """
+    
+    target = 'maintain_repo.bat'
+    template =Environment().from_string(tpl_string)
+    f = codecs.open(os.path.join(target_dir,target),mode='wb',encoding='utf-8')
+    f.write(tpl_first_line.format(":: "+mtime,'builder.py'))
+    f.write(template.render(env="tmpEnv",source=""       , upload=upload, pip_pkgs=pip_new_pkgs+pip_dev_pkgs))
+    f.close()
+
+
+sys.exit(0)
 
 os.chdir(template_dir)
 loader = jinja2.FileSystemLoader(['.','jopy'])
@@ -102,34 +246,7 @@ f.write(tpl_first_line.format("# "+mtime,template_path))
 f.write(template.render(**local_dict))
 f.close()
 
-tpl_string = """
-binstar login
-{% for pkg in pip_dev_pkgs %}
-conda skeleton pypi {{ pkg }}
-conda build {{ pkg }}
-binstar upload {{ pkg }}
-{% endfor %}
-"""
-#binstar login
-#conda skeleton pypi somepypipackage
-#conda build somepypipackage
-#binstar upload somepypipackage
-#conda config --add channels jowr
-#conda install --use-local option
 
-target = 'maintain_repo.bsh'
-template =Environment().from_string(tpl_string)
-f = codecs.open(os.path.join(target_dir,target),mode='wb',encoding='utf-8')
-f.write(tpl_first_line.format("# "+mtime,'builder.py'))
-f.write(template.render(**local_dict))
-f.close()
-
-target = 'maintain_repo.bat'
-template =Environment().from_string(tpl_string)
-f = codecs.open(os.path.join(target_dir,target),mode='wb',encoding='utf-8')
-f.write(tpl_first_line.format(":: "+mtime,'builder.py'))
-f.write(template.render(**local_dict))
-f.close()
 
 
 
