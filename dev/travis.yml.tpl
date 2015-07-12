@@ -7,6 +7,12 @@ python:
   - "3.3"
   - "2.7"
 
+#os: 
+#  - linux
+#  - osx
+#  
+#sudo: false  
+
 #env:
 #  -
 #  - PYCOSAT=0.6.0

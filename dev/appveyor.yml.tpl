@@ -34,6 +34,7 @@ install:
   - cmd: conda install -yq unxutils {{ cus_pkgs }}
   #- cmd: conda install -yq -c coolprop coolprop
   - cmd: pip install {{ pip_pkgs }}
+  - cmd: pip install {{ dev_pkgs }}
   - cmd: python setup.py install
 
 test_script:
