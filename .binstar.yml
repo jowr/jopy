@@ -39,8 +39,8 @@ package: jopy
 #   - echo "before_script!"
 ## Put your main computations here!  
 script:
-  - conda build --py all --output .
-  - conda convert --platform all $(conda build --py all --output .)
+  - conda build .
+#  - conda convert --platform all $(conda build --py all --output .)
 ## This will run after the script regardless of the result of script
 ## BINSTAR_BUILD_RESULT=[succcess|failure] 
 # after_script:
@@ -65,4 +65,4 @@ script:
 ## upload conda builds  
 ## e.g. conda is an alias for /opt/anaconda/conda-bld/<os-arch>/*.tar.bz2
 build_targets:
-  - /opt/anaconda/conda-bld/*/*.tar.bz2
+  - conda
