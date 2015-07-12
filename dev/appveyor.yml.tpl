@@ -31,10 +31,8 @@ init:
 
 install:
   - cmd: activate condaenv
-  - cmd: conda install -yq unxutils{% for pkg in cus_pkgs %} {{ pkg }}{% endfor %}
-  #- cmd: conda install -yq -c coolprop coolprop
-  - cmd: pip install{% for pkg in pip_pkgs %} {{ pkg }}{% endfor %}
-  - cmd: pip install{% for pkg in dev_pkgs %} {{ pkg }}{% endfor %}
+  - cmd: conda install -yq unxutils{% for pkg in dev_pkgs %} {{ pkg }}{% endfor %}
+  - cmd: pip install{% for pkg in pip_dev_pkgs %} {{ pkg }}{% endfor %}
   - cmd: python setup.py install
 
 test_script:

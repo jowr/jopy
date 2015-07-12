@@ -51,10 +51,9 @@ before_install:
 # Install packages
 install:
   - source activate condaenv
-  - conda install -yq atlas{% for pkg in cus_pkgs %} {{ pkg }}{% endfor %}
+  - conda install -yq atlas{% for pkg in dev_pkgs %} {{ pkg }}{% endfor %}
   #- conda install -yq -c coolprop coolprop
-  - pip install{% for pkg in pip_pkgs %} {{ pkg }}{% endfor %}
-  - pip install{% for pkg in dev_pkgs %} {{ pkg }}{% endfor %}
+  - pip install{% for pkg in pip_dev_pkgs %} {{ pkg }}{% endfor %}
   - python setup.py install
  
 # Run test

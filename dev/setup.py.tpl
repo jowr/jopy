@@ -32,7 +32,8 @@ setup(
     ],
     package_dir={'jopy': 'jopy'},
     include_package_data=True,
-    install_requires=[{% for pkg in pkgs %}
+    install_requires=[{% for pkg in cus_pkgs %}
+      '{{ pkg -}}',{% endfor %}{% for pkg in pip_cus_pkgs %}
       '{{ pkg -}}',{% endfor %}
     ],
     license='MIT',

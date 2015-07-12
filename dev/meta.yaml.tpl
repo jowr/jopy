@@ -16,14 +16,16 @@ build:
 requirements:
   build:
     - python
-    - setuptools{% for pkg in pkgs %}
+    - setuptools{% for pkg in dev_pkgs %}
     - {{ pkg -}}
-{% endfor %}{% for pkg in dev_pkgs %}
+{% endfor %}{% for pkg in pip_dev_pkgs %}
     - {{ pkg -}}
 {% endfor %}
 
   run:
-    - python{% for pkg in pkgs %}
+    - python{% for pkg in cus_pkgs %}
+    - {{ pkg -}}
+{% endfor %}{% for pkg in pip_cus_pkgs %}
     - {{ pkg -}}
 {% endfor %}
 
@@ -41,6 +43,8 @@ test:
   # at test time.
 
   requires:{% for pkg in dev_pkgs %}
+    - {{ pkg -}}
+{% endfor %}{% for pkg in pip_dev_pkgs %}
     - {{ pkg -}}
 {% endfor %}
 
