@@ -1,7 +1,7 @@
 """
 Tests for `jopy` module.
 """
-from jopy.recip import RecipExplicit, RecipImplicit
+from jopy.recip import RecipExplicit, RecipImplicit, RecipBase
 import numpy as np
 
 
@@ -39,7 +39,7 @@ class TestJopyRecip(object):
         
     def test_recip_functions(self):
         rev = TestJopyRecip.exp.revolution(100)
-        assert np.max(np.abs(TestJopyRecip.exp.volume(rev)-TestJopyRecip.imp.volume(rev)))<1e-10
+        assert np.max(np.abs(TestJopyRecip.exp.volume(rev)-TestJopyRecip.imp.volume(rev)))<1e-8
 
     @classmethod
     def teardown_class(cls):
