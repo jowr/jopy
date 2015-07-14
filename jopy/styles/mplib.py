@@ -572,6 +572,8 @@ class BaseStyle(JopyBaseClass):
         plt.tight_layout()
         
         if show: plt.show()
+        else: plt.close('all')
+                    
         return True
 
 

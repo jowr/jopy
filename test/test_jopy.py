@@ -43,8 +43,8 @@ class TestJopyRecip(object):
     def test_recip_functions(self):
         rev = TestJopyRecip.exp.revolution(100)
         diff = np.abs((TestJopyRecip.exp.volume(rev)-TestJopyRecip.imp.volume(rev))/TestJopyRecip.exp.volume(rev))
-        print(np.max(diff),np.mean(diff))
-        assert True 
+        #print(np.max(diff),np.mean(diff))
+        assert np.mean(diff)<0.005 # less than 0.5%
 
     @classmethod
     def teardown_class(cls):
@@ -62,7 +62,7 @@ class TestJopyStyle(object):
 
     def test_style_show(self):
         for obj in TestJopyStyle.objs:
-            assert not obj._show_info() 
+            assert obj._show_info(show=False) 
 
     @classmethod
     def teardown_class(cls):
