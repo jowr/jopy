@@ -1,6 +1,9 @@
 """
 Tests for `jopy` module.
 """
+import matplotlib
+matplotlib.use('Agg')
+
 from jopy.recip.mechanisms import RecipExplicit, RecipImplicit, RecipBase
 import numpy as np
 from jopy.styles.mplib import BaseStyle, DtuStyle, IpuStyle

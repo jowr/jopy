@@ -32,6 +32,7 @@ setup(
     packages=[
         'jopy',
     ],
+    py_modules=['jopy','test'],
     package_dir={'jopy': 'jopy'},
     include_package_data=True,
     install_requires=[
@@ -45,6 +46,7 @@ setup(
     ],
     license='MIT',
     zip_safe=False,
+    use_2to3=True,
     keywords='jopy',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
