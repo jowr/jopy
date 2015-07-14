@@ -183,7 +183,7 @@ class RecipBase(JopyBaseClass):
         volu = self.volume(full)
         
         import matplotlib as mpl
-        mpl.use('Qt4Agg')
+        #mpl.use('Qt4Agg')
         from matplotlib.pyplot import plot, show
         import matplotlib.pylab as plt
         
@@ -210,8 +210,8 @@ class RecipBase(JopyBaseClass):
         ax.plot(full[iMin]*180/pi,self.volume(full[iMin])*1e6,'o')
         iMax  = np.where(volu==volu.max())
         ax.plot(full[iMax]*180/pi,self.volume(full[iMax])*1e6,'o')
-        ax.set_xlabel(ur'Crankshaft angle $\theta$ (deg)')
-        ax.set_ylabel(ur'Cylinder volume $V$ (cm$^3$)')
+        ax.set_xlabel(r'Crankshaft angle $\theta$ (deg)')
+        ax.set_ylabel(r'Cylinder volume $V$ (cm$^3$)')
         show()
         
         
