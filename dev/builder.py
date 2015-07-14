@@ -167,7 +167,6 @@ exit 0
     f.close()
 
 
-sys.exit(0)
 
 os.chdir(template_dir)
 loader = jinja2.FileSystemLoader(['.','jopy'])
