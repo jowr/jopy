@@ -3,7 +3,7 @@ Created on 10 Apr 2013
 
 @author: jowr
 '''
-from __future__ import print_function, division, unicode_literals
+from __future__ import print_function, division
 
 import numpy as np
 from numpy import pi
