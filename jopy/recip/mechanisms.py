@@ -6,12 +6,11 @@ Created on 10 Apr 2013
 from __future__ import print_function, division
 
 import numpy as np
-from scipy.constants.constants import pi
-from numpy.core.numeric import infty
+from numpy import pi
 from texttable import Texttable
 from scipy.optimize._minimize import minimize_scalar
 
-from .base import JopyBaseClass
+from ..base import JopyBaseClass
 from abc import ABCMeta, abstractmethod
 from scipy.optimize import minimize
 
@@ -56,7 +55,7 @@ class RecipBase(JopyBaseClass):
         self._bo = bo
         self._pp = pp
         # Calculated values        
-        self._A_piston = np.pi * np.power(bo,2.0) / 4.0 # 
+        self._A_piston = pi * np.power(bo,2.0) / 4.0 # 
         self._l_tdc    = cv / self._A_piston # distance from piston to head at TDC
         # Angle values used for offset calculations
         self._theta_TDC = self._calc_theta_TDC()
@@ -115,11 +114,10 @@ class RecipBase(JopyBaseClass):
         """Return the angle calculated from the piston position, 
         the flag for afterTDC is needed because there are always 
         two solutions."""
-        if afterTDC:
+        if afterTDC: 
             boundaries = (self.TDC(), self.BDC())
-        else:
-            boundaries = (-2.0*np.pi+self.BDC(), self.TDC())
-        
+        else: 
+            boundaries = (-2.0*pi+self.BDC(), self.TDC())
         def f(x): return np.power(position-self.position(x),2.0) 
         res = minimize_scalar(f, bounds=boundaries, method='bounded')
         self.autolog(str(res))
@@ -133,7 +131,6 @@ class RecipBase(JopyBaseClass):
             raise ValueError("No element supplied")
         elif elms==1: 
             return self.calc_theta_from_position_single(position,afterTDC)
-        
         if (afterTDC is not None) and (position[0]<position[1]):
             afterTDC = False 
         elif (afterTDC is not None) and (position[0]>position[1]):
@@ -142,7 +139,7 @@ class RecipBase(JopyBaseClass):
             raise ValueError("Could not determine starting point.")
         
         start = self.calc_theta_from_position_single(position[0],afterTDC)
-        stop0 = start + 1.9*np.pi 
+        stop0 = start + 1.9*pi 
         def f(stop): 
             steps = np.linspace(start, stop, elms)
             return np.sum(np.power(position-self.position(steps),2.0))
@@ -168,17 +165,17 @@ class RecipBase(JopyBaseClass):
         table.add_row(["cl", self._cl,"m","conrod length"])
         table.add_row(["bo", self._bo,"m","bore"])
         table.add_row(["pp", self._pp,"m","piston pin offset"])
-        table.add_row(["cv", self._l_tdc * self._A_piston,"m3","clearance volume at TDC"])
-        table.add_row(["TDC", self.TDC(),"rad","angle of piston TDC"])
-        table.add_row(["BDC", self.BDC(),"rad","angle of piston BDC"])
-        table.add_row(["Max V", self.volume(self.BDC())*1e6,"cm3","max volume at BDC"])
-        table.add_row(["Min V", self.volume(self.TDC())*1e6,"cm3","min volume at TDC"])
+        table.add_row(["cv", self._l_tdc*self._A_piston*1e6,"cm3","clearance volume at TDC"])
+        table.add_row(["TDC", np.degrees(self.TDC()),"deg","angle of piston TDC"])
+        table.add_row(["BDC", np.degrees(self.BDC()),"deg","angle of piston BDC"])
+        table.add_row(["Max V", self.volume(self.BDC())*1e6,"cm3","volume at BDC"])
+        table.add_row(["Min V", self.volume(self.TDC())*1e6,"cm3","volume at TDC"])
         print("\n"+table.draw()+"\n")
         
     
     def revolution(self,num):
         # num: steps you get
-        full = np.linspace(-np.pi,np.pi,num+1)
+        full = np.linspace(-pi,pi,num+1)
         return full[:-1]
     
     def plotVolume(self):
@@ -213,7 +210,7 @@ class RecipBase(JopyBaseClass):
         ax.plot(full[iMin]*180/pi,self.volume(full[iMin])*1e6,'o')
         iMax  = np.where(volu==volu.max())
         ax.plot(full[iMax]*180/pi,self.volume(full[iMax])*1e6,'o')
-        ax.set_xlabel(ur'Crankshaft angle $\theta$ (\u00B0)')
+        ax.set_xlabel(ur'Crankshaft angle $\theta$ (deg)')
         ax.set_ylabel(ur'Cylinder volume $V$ (cm$^3$)')
         show()
         
@@ -262,7 +259,7 @@ class RecipExplicit(RecipBase):
 
     def _calc_theta_BDC(self):
         """Calculate the crankshaft angle at BDC"""
-        return -np.arcsin(self._pp/(self._cl-self._cr)) + np.pi 
+        return -np.arcsin(self._pp/(self._cl-self._cr)) + pi 
     
     def _calc_distance_from_shaft(self,_theta):
         """Calculate the distance from crankshaft centre to piston pin"""
@@ -328,6 +325,7 @@ class RecipImplicit(RecipBase):
         #return self._l_max-self._calc_distance_from_shaft(_theta)+self._l_tdc
 
 
+   
 
 # class CylinderHetaTransfer(object):
 #     
