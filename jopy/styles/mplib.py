@@ -6,6 +6,7 @@ Created on 14 Jul 2015
 from __future__ import print_function
 from ..base import JopyBaseClass
 import matplotlib as mpl
+import matplotlib.cm as mplcm
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 import brewer2mpl
@@ -28,13 +29,14 @@ class BaseStyle(JopyBaseClass):
         #self._black = 'green'
         self._lgrey = "#FBFBFB" #"GhostWhite"
         self._linewi = 1
+        self._color_maps = {}
         self._register_color_maps()
         self._color_lists = {}
         self._register_color_lists()
     
     def update_rc_params(self):
         #mpl.rcParams['legend.fontsize'] = 'medium'
-        mpl.rcParams['font.size'] = 11.0
+        mpl.rcParams['font.size']       = 11.0
         mpl.rcParams['font.serif']      = "Bitstream Vera Serif, New Century Schoolbook, Century Schoolbook L, Utopia, ITC Bookman, Bookman, Nimbus Roman No9 L, Times New Roman, Times, Palatino, Charter, serif"
         mpl.rcParams['font.sans-serif'] = "Bitstream Vera Sans, Lucida Grande, Verdana, Geneva, Lucid, Arial, Helvetica, Avant Garde, sans-serif"
         mpl.rcParams['font.cursive']    = "Apple Chancery, Textile, Zapf Chancery, Sand, cursive"
@@ -167,9 +169,9 @@ class BaseStyle(JopyBaseClass):
             reverse = not reverse
         # Use the standard maps
         if reverse:
-            cm = mpl.cm.get_cmap(name+'_r')
+            cm = mplcm.get_cmap(name+'_r')
         else:
-            cm = mpl.cm.get_cmap(name)
+            cm = mplcm.get_cmap(name)
         return cm #LinearSegmentedColormap.from_list(cm)
 
     
@@ -498,13 +500,13 @@ class BaseStyle(JopyBaseClass):
         specs['matteoniccoli'] = dict(zip(k,rgb)) 
         
         for name in specs:
-            mpl.cm.register_cmap(name=name, data=specs[name])
-            mpl.cm.register_cmap(name=name+"_r", data=mpl.cm._reverse_cmap_spec(specs[name]))
+            mplcm.register_cmap(name=name, data=specs[name])
+            mplcm.register_cmap(name=name+"_r", data=mplcm._reverse_cmap_spec(specs[name]))
+            self._color_maps[name] = self.get_color_map(name)
+            self._color_maps[name+"_r"] = self.get_color_map(name+"_r")
             
     def _register_color_lists(self, length=default_lst):
         cc = mpl.colors.ColorConverter()
-        self._color_lists['DTU']        = ['#FF0000', '#99CC33', '#660099', '#FFCC00', '#999999', '#000000', '#33CCFF', '#3366CC', '#FF9900', '#CC3399', '#66CC00']
-        self._color_lists['DTU_dark']   = ['#FF0000', '#660099', '#99CC33', '#3366CC', '#999999', '#FFCC00', '#000000', '#33CCFF', '#FF9900', '#CC3399', '#66CC00']
         self._color_lists['matplotlib'] = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
         self._color_lists['simple']     = ['#FF0000', '#FFD300', '#3914AF', '#00CC00']
         self._color_lists['brewer']     = ['#e66101', '#fdb863', '#b2abd2', '#5e3c99']
@@ -542,6 +544,35 @@ class BaseStyle(JopyBaseClass):
             elif length>len(clist):
                 self.autolog("Colour cycle is too short, cannot extend it.")
         return cycle(clist)
+    
+    def _show_info(self,show=True):
+        self.update_rc_params()
+        lsts = self._color_lists.keys() 
+        l = len(lsts) 
+        import matplotlib.pyplot as plt
+        plt.figure()
+        xdata = np.linspace(0,6)
+        for i, m in enumerate(lsts):
+            plt.subplot(1,l,i+1)
+            plt.axis("off")
+            for j in self._color_lists[m]:
+                plt.plot(xdata,np.random.normal(size=len(xdata)),lw=1.5,color=j)
+            plt.title(m,rotation=45)
+        plt.tight_layout()
+
+        xdata=np.outer(np.arange(0,1,0.01),np.ones(10))
+        maps = [m for m in self._color_maps.keys() if not m.endswith("_r")]
+        l=len(maps)
+        plt.figure()
+        for i, m in enumerate(maps):
+            plt.subplot(1,l,i+1)
+            plt.axis("off")
+            plt.imshow(xdata,aspect='auto',cmap=plt.get_cmap(m),origin="lower")
+            plt.title(m,rotation=45)
+        plt.tight_layout()
+        
+        if show: plt.show()
+        return True
 
 
 class DtuStyle(BaseStyle):
@@ -591,7 +622,8 @@ class DtuStyle(BaseStyle):
         maps.append(LinearSegmentedColormap.from_list('DTU4_r', yellowwhite[::-1]))
         
         for map in maps:
-            mpl.cm.register_cmap(cmap=map)
+            mplcm.register_cmap(cmap=map)
+            self._color_maps[map.name] = map
 
     def _register_color_lists(self, length=BaseStyle.default_lst):
         BaseStyle._register_color_lists(self)
@@ -640,18 +672,19 @@ class IpuStyle(BaseStyle):
         maps.append(LinearSegmentedColormap.from_list('IPU_r', rgb[::-1]))
     
         for map in maps:
-            mpl.cm.register_cmap(cmap=map)
+            mplcm.register_cmap(cmap=map)
+            self._color_maps[map.name] = map
     
-    #def _register_color_lists(self, length=BaseStyle.default_lst):
-    #    BaseStyle._register_color_lists(self)
-    #    self._color_lists['IPU']      = [
-    #      #(  0./255. ,   0./255. ,   0./255.),     
-    #      (  0./255. , 102./255. ,  51./255.),
-    #      (114./255. , 121./255. , 126./255.),
-    #      ( 91./255. , 172./255. ,  38./255.),
-    #      (217./255. , 220./255. , 222./255.),
-    #      #(255./255. , 255./255. , 255./255.)
-    #    ]
+    def _register_color_lists(self, length=BaseStyle.default_lst):
+        BaseStyle._register_color_lists(self)
+        self._color_lists['IPU']      = [
+          (  0./255. ,   0./255. ,   0./255.),     
+          (  0./255. , 102./255. ,  51./255.),
+          (114./255. , 121./255. , 126./255.),
+          ( 91./255. , 172./255. ,  38./255.),
+          (217./255. , 220./255. , 222./255.),
+          #(255./255. , 255./255. , 255./255.)
+        ]
         
-    #def color_cycle(self, name='IPU', map=None, length=None):
-    #    return BaseStyle.color_cycle(self, name, map, length)
+    def color_cycle(self, name='IPU', map=None, length=None):
+        return BaseStyle.color_cycle(self, name, map, length)

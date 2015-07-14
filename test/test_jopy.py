@@ -3,6 +3,7 @@ Tests for `jopy` module.
 """
 from jopy.recip.mechanisms import RecipExplicit, RecipImplicit, RecipBase
 import numpy as np
+from jopy.styles.mplib import BaseStyle, DtuStyle, IpuStyle
 
 LOCAL=True
 
@@ -44,6 +45,24 @@ class TestJopyRecip(object):
         diff = np.abs((TestJopyRecip.exp.volume(rev)-TestJopyRecip.imp.volume(rev))/TestJopyRecip.exp.volume(rev))
         print(np.max(diff),np.mean(diff))
         assert True 
+
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+class TestJopyStyle(object):
+    objs = []
+
+    @classmethod
+    def setup_class(cls):
+        TestJopyStyle.objs.append(BaseStyle())
+        TestJopyStyle.objs.append(DtuStyle())
+        TestJopyStyle.objs.append(IpuStyle())
+        pass
+
+    def test_style_show(self):
+        for obj in TestJopyStyle.objs:
+            assert not obj._show_info() 
 
     @classmethod
     def teardown_class(cls):
