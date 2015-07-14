@@ -25,7 +25,7 @@ mtime = datetime.datetime.fromtimestamp(os.path.getmtime(__file__)).strftime('%Y
 bas_pkgs = ["conda-env", "conda-build", "binstar", "binstar-build", "jinja2"]
 
 cus_pkgs = ["numpy", "scipy", "matplotlib", "pandas"]
-pip_cus_pkgs = ["coolprop", "texttable", "brewer2mpl"]
+pip_cus_pkgs = ["coolprop", "texttable", "brewer2mpl","future"]
 
 dev_pkgs = cus_pkgs + ["pip", "pyyaml", "nose", "sphinx", "jinja2"]
 pip_dev_pkgs = pip_cus_pkgs + ["coveralls", "nose-cov", "codecov", "tox"]
