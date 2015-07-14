@@ -3,7 +3,7 @@ Created on 14 Jul 2015
 
 @author: jowr
 '''
-from __future__ import print_function
+from __future__ import print_function, division
 from ..base import JopyBaseClass
 import matplotlib as mpl
 import matplotlib.cm as mplcm
@@ -133,7 +133,7 @@ class BaseStyle(JopyBaseClass):
         it receives and object that has been extracted before"""
         lst = []
         while True:
-            obj = cyc.next()
+            obj = next(cyc)
             if obj not in lst: lst.append(obj)
             else: return lst
 
