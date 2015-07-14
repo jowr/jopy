@@ -30,7 +30,6 @@ setup(
     packages=[
         'jopy',
     ],
-    py_modules=['jopy','test'],
     package_dir={'jopy': 'jopy'},
     include_package_data=True,
     install_requires=[{% for pkg in cus_pkgs %}

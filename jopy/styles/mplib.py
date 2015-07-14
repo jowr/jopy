@@ -3,7 +3,7 @@ Created on 14 Jul 2015
 
 @author: jowr
 '''
-from __future__ import print_function, division
+from __future__ import print_function, division, unicode_literals
 from ..base import JopyBaseClass
 import matplotlib as mpl
 import matplotlib.cm as mplcm
@@ -116,7 +116,7 @@ class BaseStyle(JopyBaseClass):
         #    yield element
         res = []
         for i in objs+lst:
-            if isinstance(i, basestring):
+            if isinstance(i, str):
                 iy = unicode(i).strip()
             else:
                 iy = i
