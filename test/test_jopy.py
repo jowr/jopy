@@ -1,8 +1,8 @@
 """
 Tests for `jopy` module.
 """
-import matplotlib
-matplotlib.use('Agg')
+import matplotlib; matplotlib.use('Agg')
+from matplotlib.figure import Figure
 
 from jopy.recip.mechanisms import RecipExplicit, RecipImplicit, RecipBase
 import numpy as np
@@ -65,7 +65,9 @@ class TestJopyStyle(object):
 
     def test_style_show(self):
         for obj in TestJopyStyle.objs:
-            assert obj._show_info(show=False) 
+            line_fig,map_fig = obj._show_info(show=False)
+            assert isinstance(line_fig, Figure)
+            assert isinstance(map_fig, Figure)
 
     @classmethod
     def teardown_class(cls):

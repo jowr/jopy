@@ -4,7 +4,6 @@ Created on 14 Jul 2015
 @author: jowr
 '''
 from __future__ import print_function, division
-from past.builtins import basestring 
 
 from ..base import JopyBaseClass
 import matplotlib as mpl
@@ -550,7 +549,7 @@ class BaseStyle(JopyBaseClass):
         lsts = self._color_lists.keys() 
         l = len(lsts) 
         import matplotlib.pyplot as plt
-        plt.figure()
+        line_fig = plt.figure()
         xdata = np.linspace(0,6)
         for i, m in enumerate(lsts):
             plt.subplot(1,l,i+1)
@@ -563,7 +562,7 @@ class BaseStyle(JopyBaseClass):
         xdata=np.outer(np.arange(0,1,0.01),np.ones(10))
         maps = [m for m in self._color_maps.keys() if not m.endswith("_r")]
         l=len(maps)
-        plt.figure()
+        map_fig = plt.figure()
         for i, m in enumerate(maps):
             plt.subplot(1,l,i+1)
             plt.axis("off")
@@ -572,9 +571,8 @@ class BaseStyle(JopyBaseClass):
         plt.tight_layout()
         
         if show: plt.show()
-        else: plt.close('all')
-                    
-        return True
+        #else: plt.close('all')
+        return line_fig,map_fig
 
 
 class DtuStyle(BaseStyle):
