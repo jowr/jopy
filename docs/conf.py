@@ -28,13 +28,19 @@ import jopy
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 if on_rtd:
-    from unittest.mock import MagicMock
-    class Mock(MagicMock):
-        @classmethod
-        def __getattr__(cls, name):
-                return Mock()
-    MOCK_MODULES = ['pygtk', 'gtk', 'gobject', 'argparse', 'numpy', 'pandas', 'scipy', 'scipy.interpolate', 'matplotlib', 'matplotlib.pyplot']
+    MOCK_MODULES = ['pygtk', 'gtk', 'gobject', 'argparse', 'numpy', 'pandas', 'scipy', 'scipy.interpolate', 'matplotlib', 'matplotlib.pyplot', "blaze"]
+    try:
+        from unittest.mock import MagicMock
+        class Mock(MagicMock):
+            @classmethod
+            def __getattr__(cls, name):
+                    return Mock()
+    except:
+        from mock import Mock
+        pass
+        
     sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+
 
 
 # -- General configuration -----------------------------------------------------
