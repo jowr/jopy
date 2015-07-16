@@ -5,7 +5,7 @@ from blaze.interactive import Data
 def get_sqlite_handle(path):
     """Gets a blaze object for an sqlite database
 
-    Does not simplify things, but help me remeber to use blaze more
+    Does not simplify things, but help me remember to use blaze more
     
     Parameters
     ----------
