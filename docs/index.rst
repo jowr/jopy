@@ -16,6 +16,7 @@ Contents:
    contributing
    authors
    history
+   code/index
 
 Feedback
 ========
@@ -25,3 +26,11 @@ at jopy@jorrit.org.
 
 If you encounter any errors or problems with **Jorrit's Python Package**, please let me know!
 Open an Issue at the GitHub http://github.com/jowr/jopy main repository.
+
+
+Indices and tables
+==================
+ 
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

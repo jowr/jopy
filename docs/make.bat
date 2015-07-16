@@ -3,7 +3,11 @@
 REM Command file for Sphinx documentation
 
 if "%SPHINXBUILD%" == "" (
-	set SPHINXBUILD=sphinx-build
+REM	set SPHINXBUILD=sphinx-build
+set SPHINXBUILD=pushd "%~dp0"
+call "%~f0" apidoc
+popd
+sphinx-build
 )
 set BUILDDIR=_build
 set ALLSPHINXOPTS=-d %BUILDDIR%/doctrees %SPHINXOPTS% .
@@ -61,6 +65,7 @@ if errorlevel 9009 (
 )
 
 if "%1" == "html" (
+	call :apidoc
 	%SPHINXBUILD% -b html %ALLSPHINXOPTS% %BUILDDIR%/html
 	if errorlevel 1 exit /b 1
 	echo.
@@ -69,6 +74,7 @@ if "%1" == "html" (
 )
 
 if "%1" == "dirhtml" (
+	call :apidoc
 	%SPHINXBUILD% -b dirhtml %ALLSPHINXOPTS% %BUILDDIR%/dirhtml
 	if errorlevel 1 exit /b 1
 	echo.
@@ -77,6 +83,7 @@ if "%1" == "dirhtml" (
 )
 
 if "%1" == "singlehtml" (
+	call :apidoc
 	%SPHINXBUILD% -b singlehtml %ALLSPHINXOPTS% %BUILDDIR%/singlehtml
 	if errorlevel 1 exit /b 1
 	echo.
@@ -85,6 +92,7 @@ if "%1" == "singlehtml" (
 )
 
 if "%1" == "pickle" (
+	call :apidoc
 	%SPHINXBUILD% -b pickle %ALLSPHINXOPTS% %BUILDDIR%/pickle
 	if errorlevel 1 exit /b 1
 	echo.
@@ -93,6 +101,7 @@ if "%1" == "pickle" (
 )
 
 if "%1" == "json" (
+	call :apidoc
 	%SPHINXBUILD% -b json %ALLSPHINXOPTS% %BUILDDIR%/json
 	if errorlevel 1 exit /b 1
 	echo.
@@ -101,6 +110,7 @@ if "%1" == "json" (
 )
 
 if "%1" == "htmlhelp" (
+	call :apidoc
 	%SPHINXBUILD% -b htmlhelp %ALLSPHINXOPTS% %BUILDDIR%/htmlhelp
 	if errorlevel 1 exit /b 1
 	echo.
@@ -110,6 +120,7 @@ if "%1" == "htmlhelp" (
 )
 
 if "%1" == "qthelp" (
+	call :apidoc
 	%SPHINXBUILD% -b qthelp %ALLSPHINXOPTS% %BUILDDIR%/qthelp
 	if errorlevel 1 exit /b 1
 	echo.
@@ -122,6 +133,7 @@ if "%1" == "qthelp" (
 )
 
 if "%1" == "devhelp" (
+	call :apidoc
 	%SPHINXBUILD% -b devhelp %ALLSPHINXOPTS% %BUILDDIR%/devhelp
 	if errorlevel 1 exit /b 1
 	echo.
@@ -130,6 +142,7 @@ if "%1" == "devhelp" (
 )
 
 if "%1" == "epub" (
+	call :apidoc
 	%SPHINXBUILD% -b epub %ALLSPHINXOPTS% %BUILDDIR%/epub
 	if errorlevel 1 exit /b 1
 	echo.
@@ -138,6 +151,7 @@ if "%1" == "epub" (
 )
 
 if "%1" == "latex" (
+	call :apidoc
 	%SPHINXBUILD% -b latex %ALLSPHINXOPTS% %BUILDDIR%/latex
 	if errorlevel 1 exit /b 1
 	echo.
@@ -146,6 +160,7 @@ if "%1" == "latex" (
 )
 
 if "%1" == "latexpdf" (
+	call :apidoc
 	%SPHINXBUILD% -b latex %ALLSPHINXOPTS% %BUILDDIR%/latex
 	cd %BUILDDIR%/latex
 	make all-pdf
@@ -156,6 +171,7 @@ if "%1" == "latexpdf" (
 )
 
 if "%1" == "latexpdfja" (
+	call :apidoc
 	%SPHINXBUILD% -b latex %ALLSPHINXOPTS% %BUILDDIR%/latex
 	cd %BUILDDIR%/latex
 	make all-pdf-ja
@@ -166,6 +182,7 @@ if "%1" == "latexpdfja" (
 )
 
 if "%1" == "text" (
+	call :apidoc
 	%SPHINXBUILD% -b text %ALLSPHINXOPTS% %BUILDDIR%/text
 	if errorlevel 1 exit /b 1
 	echo.
@@ -174,6 +191,7 @@ if "%1" == "text" (
 )
 
 if "%1" == "man" (
+	call :apidoc
 	%SPHINXBUILD% -b man %ALLSPHINXOPTS% %BUILDDIR%/man
 	if errorlevel 1 exit /b 1
 	echo.
@@ -182,6 +200,7 @@ if "%1" == "man" (
 )
 
 if "%1" == "texinfo" (
+	call :apidoc
 	%SPHINXBUILD% -b texinfo %ALLSPHINXOPTS% %BUILDDIR%/texinfo
 	if errorlevel 1 exit /b 1
 	echo.
@@ -190,6 +209,7 @@ if "%1" == "texinfo" (
 )
 
 if "%1" == "gettext" (
+	call :apidoc
 	%SPHINXBUILD% -b gettext %I18NSPHINXOPTS% %BUILDDIR%/locale
 	if errorlevel 1 exit /b 1
 	echo.
@@ -198,6 +218,7 @@ if "%1" == "gettext" (
 )
 
 if "%1" == "changes" (
+	call :apidoc
 	%SPHINXBUILD% -b changes %ALLSPHINXOPTS% %BUILDDIR%/changes
 	if errorlevel 1 exit /b 1
 	echo.
@@ -206,6 +227,7 @@ if "%1" == "changes" (
 )
 
 if "%1" == "linkcheck" (
+	call :apidoc
 	%SPHINXBUILD% -b linkcheck %ALLSPHINXOPTS% %BUILDDIR%/linkcheck
 	if errorlevel 1 exit /b 1
 	echo.
@@ -215,6 +237,7 @@ or in %BUILDDIR%/linkcheck/output.txt.
 )
 
 if "%1" == "doctest" (
+	call :apidoc
 	%SPHINXBUILD% -b doctest %ALLSPHINXOPTS% %BUILDDIR%/doctest
 	if errorlevel 1 exit /b 1
 	echo.
@@ -224,6 +247,7 @@ results in %BUILDDIR%/doctest/output.txt.
 )
 
 if "%1" == "xml" (
+	call :apidoc
 	%SPHINXBUILD% -b xml %ALLSPHINXOPTS% %BUILDDIR%/xml
 	if errorlevel 1 exit /b 1
 	echo.
@@ -232,6 +256,7 @@ if "%1" == "xml" (
 )
 
 if "%1" == "pseudoxml" (
+	call :apidoc
 	%SPHINXBUILD% -b pseudoxml %ALLSPHINXOPTS% %BUILDDIR%/pseudoxml
 	if errorlevel 1 exit /b 1
 	echo.
@@ -239,4 +264,17 @@ if "%1" == "pseudoxml" (
 	goto end
 )
 
+goto end
+
+:apidoc
+REM if "%1" == "apidoc" (
+	pushd "%~dp0"\..
+	sphinx-apidoc -fM -o docs\code jopy 
+	if errorlevel 1 exit /b 1
+	popd
+	echo.
+	echo.Build finished. Output of sphinx-apidoc is in docs/code.
+	goto :eof 
+REM )
+	
 :end
