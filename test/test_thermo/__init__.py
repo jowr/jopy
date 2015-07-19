@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, division
 
-from jopy.thermo import _lmtd
+import jopy.thermo
 
 class TestUtils(object):
 
@@ -10,9 +10,9 @@ class TestUtils(object):
         pass
 
     def test_lmtd(self):
-        res = _lmtd(0.0, 0.0)
+        res = jopy.thermo.lmtd(0.0, 0.0)
         assert res == 0.0
-        res = _lmtd(10.0, 10.0)
+        res = jopy.thermo.lmtd(10.0, 10.0)
         print(res,10.0)
 
     @classmethod

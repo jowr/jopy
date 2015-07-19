@@ -91,7 +91,8 @@ def _lmtd_jopy(Delta_T1, Delta_T2, dead_band=0.1):
             The calculated logarithmic mean temperature difference
     
     """
-    
+    Delta_T1       = np.asarray(Delta_T1)
+    Delta_T2       = np.asarray(Delta_T2)    
     res            = empty_like(Delta_T1)
     mask           = np.abs(Delta_T1) < np.abs(Delta_T2) 
     res[mask]      = np.sign(Delta_T2[mask])    

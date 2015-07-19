@@ -17,4 +17,12 @@ jopy.styles.mplib module
     :undoc-members:
     :show-inheritance:
 
+jopy.styles.plots module
+------------------------
+
+.. automodule:: jopy.styles.plots
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
