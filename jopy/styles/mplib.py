@@ -1,8 +1,4 @@
-'''
-Created on 14 Jul 2015
-
-@author: jowr
-'''
+# -*- coding: utf-8 -*-
 from __future__ import print_function, division
 
 from ..base import JopyBaseClass
@@ -12,6 +8,8 @@ import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 import brewer2mpl
 from itertools import cycle
+import sys
+import platform
 
 class BaseStyle(JopyBaseClass):
     default_map = "cubehelix_kindl"
@@ -29,7 +27,7 @@ class BaseStyle(JopyBaseClass):
         #self._black = "#000000"
         #self._black = 'green'
         self._lgrey = "#FBFBFB" #"GhostWhite"
-        self._linewi = 1
+        self._linewi = 0.75
         self._color_maps = {}
         self._register_color_maps()
         self._color_lists = {}
@@ -45,9 +43,15 @@ class BaseStyle(JopyBaseClass):
         mpl.rcParams['font.monospace']  = "Bitstream Vera Sans Mono, Andale Mono, Nimbus Mono L, Courier New, Courier, Fixed, Terminal, monospace"
                 
         #mpl.rcParams['text.usetex'] = True
-        #mpl.rcParams['text.latex.unicode']=True
-        ##%\usepackage[tt={oldstyle=true,variable=true}]{cfr-lm} % Typewriter font
+        mpl.rcParams['text.latex.unicode']=True
         mpl.rcParams['text.latex.preamble'] = self._mplpreamble()
+        
+        mpl.rcParams['mathtext.fontset'] = "cm" # Should be 'cm' (Computer Modern), 'stix', 'stixsans'
+        
+        if platform.system() == 'Windows':
+            mpl.rcParams['pdf.fonttype'] = 42
+            mpl.rcParams['ps.fonttype']  = 42
+
         
         # ######################
         mpl.rcParams["patch.edgecolor"]      = self._black
@@ -104,7 +108,7 @@ class BaseStyle(JopyBaseClass):
         preamble.append(r'\usepackage[binary-units=true,abbreviations=true]{siunitx}')
         preamble.append(r'\usepackage{amsmath}')
         #preamble.append(r'\usepackage{amssymb}')
-        preamble.append(r'\usepackage{mhchem}')
+        preamble.append(r'\usepackage[version=3]{mhchem}')
         return preamble 
     
     def _add_to_list(self,objs,lst):
@@ -516,10 +520,10 @@ class BaseStyle(JopyBaseClass):
         self._color_lists['brewer2']    = brewer2mpl.get_map('Set2', 'qualitative', length).mpl_colors
         
 
-    def color_cycle(self, name='map', map=None, length=None):
+    def color_cycle(self, name='map', cmap=None, length=None):
         '''Returns the current colour cycle, creates a new one if necessary.
         name: selector for colour cycle
-            'map': use a colourmap to generate cycle, see http://matplotlib.org/1.2.1/examples/pylab_examples/show_colormaps.html
+            'cmap': use a colourmap to generate cycle, see http://matplotlib.org/1.2.1/examples/pylab_examples/show_colormaps.html
             'DTU': uses the colours from the DTU design guide
             'DTU_dark': uses the colours from the DTU design guide, darker colours first, good for presentations
             'cblind': A scheme for colourblind people
@@ -529,8 +533,8 @@ class BaseStyle(JopyBaseClass):
         '''
         if name=='map':
             if length is None: length = self.default_lst
-            if map is None: map = self.default_map
-            cmap  = self.get_color_map(map)
+            if cmap is None: cmap = self.default_map
+            cmap  = self.get_color_map(cmap)
             clist = [cmap(i) for i in np.linspace(0.25, 0.75, length)]
         else:
             clist = self._color_lists[name]
@@ -593,7 +597,14 @@ class DtuStyle(BaseStyle):
         #mpl.rcParams['mathtext.it'] = 'Minion Pro:italic'
         #mpl.rcParams['mathtext.bf'] = 'Minion Pro:bold'
          
-        #mpl.rcParams['mathtext.fontset'] = 'custom'        
+        mpl.rcParams['mathtext.fontset'] = "custom" # Should be 'cm' (Computer Modern), 'stix', 'stixsans'
+        mpl.rcParams['mathtext.cal'] = 'serif:italic'
+        mpl.rcParams['mathtext.rm']  = 'serif'
+        mpl.rcParams['mathtext.tt']  = 'monospace'
+        mpl.rcParams['mathtext.it']  = 'serif:italic'
+        mpl.rcParams['mathtext.bf']  = 'serif:bold'
+        mpl.rcParams['mathtext.sf']  = 'sans'
+         
          
     def _mplpreamble(self):
         preamble = BaseStyle._mplpreamble(self)
@@ -621,9 +632,9 @@ class DtuStyle(BaseStyle):
         maps.append(LinearSegmentedColormap.from_list('DTU4', yellowwhite))
         maps.append(LinearSegmentedColormap.from_list('DTU4_r', yellowwhite[::-1]))
         
-        for map in maps:
-            mplcm.register_cmap(cmap=map)
-            self._color_maps[map.name] = map
+        for cmap in maps:
+            mplcm.register_cmap(cmap=cmap)
+            self._color_maps[cmap.name] = cmap
 
     def _register_color_lists(self, length=BaseStyle.default_lst):
         BaseStyle._register_color_lists(self)
@@ -644,16 +655,24 @@ class IpuStyle(BaseStyle):
         self._add_to_rc_font_list('Helvetica, Arial, cmbright, Verdana','font.sans-serif')
         self._add_to_rc_font_list('Times New Roman, Times','font.serif') 
         self._add_to_rc_font_list('sourcecodepro','font.monospace')
-        #mpl.rcParams['font.monospace'] = 'CMU Typewriter Text'
-         
         mpl.rcParams['font.family'] = 'sans-serif'
+        #mpl.rcParams['font.monospace'] = 'CMU Typewriter Text'
+        mpl.rcParams['mathtext.fontset'] = "custom" # Should be 'cm' (Computer Modern), 'stix', 'stixsans'
+        mpl.rcParams['mathtext.cal'] = 'sans:italic'
+        mpl.rcParams['mathtext.rm']  = 'sans'
+        mpl.rcParams['mathtext.tt']  = 'monospace'
+        mpl.rcParams['mathtext.it']  = 'sans:italic'
+        mpl.rcParams['mathtext.bf']  = 'sans:bold'
+        mpl.rcParams['mathtext.sf']  = 'sans'
                 
          
     def _mplpreamble(self):
         preamble = BaseStyle._mplpreamble(self)
         preamble.append(r'\usepackage{cmbright}')
-        preamble.append(r'\usepackage[scaled]{helvet}')
-        preamble.append(r'\renewcommand*{\familydefault}{\sfdefault}')
+        preamble.append(r'\usepackage{helvet}')
+        #preamble.append(r'\usepackage{sansmath}')
+        #preamble.append(r'\sansmath')
+        #preamble.append(r'\renewcommand*{\familydefault}{\sfdefault}')
         return preamble 
     
     def _register_color_maps(self):
@@ -671,9 +690,9 @@ class IpuStyle(BaseStyle):
         maps.append(LinearSegmentedColormap.from_list('IPU'  , rgb))
         maps.append(LinearSegmentedColormap.from_list('IPU_r', rgb[::-1]))
     
-        for map in maps:
-            mplcm.register_cmap(cmap=map)
-            self._color_maps[map.name] = map
+        for cmap in maps:
+            mplcm.register_cmap(cmap=cmap)
+            self._color_maps[cmap.name] = cmap
     
     def _register_color_lists(self, length=BaseStyle.default_lst):
         BaseStyle._register_color_lists(self)
@@ -686,5 +705,48 @@ class IpuStyle(BaseStyle):
           #(255./255. , 255./255. , 255./255.)
         ]
         
-    def color_cycle(self, name='IPU', map=None, length=None):
+    def color_cycle(self, name='IPU', cmap=None, length=None):
+        return BaseStyle.color_cycle(self, name, map, length)
+
+
+class VdgStyle(BaseStyle):
+    def __init__(self):
+        BaseStyle.__init__(self)
+        mpl.rcParams['lines.linewidth'] = 1.25     # line width in points
+        
+    def update_rc_params(self):
+        BaseStyle.update_rc_params(self)
+        self._add_to_rc_font_list('Helvetica, Arial, cmbright, Verdana','font.sans-serif')
+        self._add_to_rc_font_list('Times New Roman, Times','font.serif')
+        self._add_to_rc_font_list('sourcecodepro','font.monospace')
+        mpl.rcParams['font.family'] = 'sans-serif'
+        mpl.rcParams['mathtext.fontset'] = "custom" # Should be 'cm' (Computer Modern), 'stix', 'stixsans'
+        mpl.rcParams['mathtext.cal'] = 'sans:italic'
+        mpl.rcParams['mathtext.rm']  = 'sans'
+        mpl.rcParams['mathtext.tt']  = 'monospace'
+        mpl.rcParams['mathtext.it']  = 'sans:italic'
+        mpl.rcParams['mathtext.bf']  = 'sans:bold'
+        mpl.rcParams['mathtext.sf']  = 'sans'
+                
+         
+    def _mplpreamble(self):
+        preamble = BaseStyle._mplpreamble(self)
+        preamble.append(r'\usepackage{cmbright}')
+        preamble.append(r'\usepackage{helvet}')
+        #preamble.append(r'\usepackage{sansmath}')
+        #preamble.append(r'\sansmath')
+        #preamble.append(r'\renewcommand*{\familydefault}{\sfdefault}')
+        return preamble 
+
+    def _register_color_lists(self, length=BaseStyle.default_lst):
+        BaseStyle._register_color_lists(self)
+        self._color_lists['VDG']      = [
+          (  0./255. ,  51./255. , 102./255.),     
+          (205./255. ,  51./255. ,  51./255.),
+          (  0./255. , 109./255. , 148./255.),
+          (127./255. , 186./255. ,  50./255.),
+          #(255./255. , 255./255. , 255./255.)
+        ]
+        
+    def color_cycle(self, name='VDG', cmap=None, length=None):
         return BaseStyle.color_cycle(self, name, map, length)

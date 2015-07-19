@@ -1,6 +1,6 @@
-"""
-Tests for `jopy` module.
-"""
+# -*- coding: utf-8 -*-
+from __future__ import print_function, division
+
 import matplotlib; matplotlib.use('Agg')
 from matplotlib.figure import Figure
 

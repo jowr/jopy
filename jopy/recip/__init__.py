@@ -1,4 +1,5 @@
-
+# -*- coding: utf-8 -*-
+from __future__ import print_function, division
 
 if __name__ == "__main__":
     from jopy.recip.mechanisms import RecipExplicit, RecipImplicit

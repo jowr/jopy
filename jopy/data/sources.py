@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+from __future__ import print_function, division
 
 import os
 from blaze.interactive import Data
@@ -5,7 +7,7 @@ from blaze.interactive import Data
 def get_sqlite_handle(path):
     """Gets a blaze object for an sqlite database
 
-    Does not simplify things, but help me remember to use blaze more
+    Does not simplify things, but helps me remember to use blaze more
     
     Parameters
     ----------
