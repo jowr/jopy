@@ -17,14 +17,14 @@ def transition_factor(start=0.25, stop=0.75, position=0.5, order=2):
 
     Parameters:
     -----------
-        start : float
-            start of transition interval; default 0.25
-        stop : float 
-            end of transition interval; default 0.75
-        position : float 
-            current position; default 0.5
-        order : integer
-            Smooth up to which derivative?; default 2
+    start : float
+        start of transition interval; default 0.25
+    stop : float 
+        end of transition interval; default 0.75
+    position : float 
+        current position; default 0.5
+    order : integer
+        Smooth up to which derivative?; default 2
 
     Returns:
     --------

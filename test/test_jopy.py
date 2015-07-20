@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, division
 
-import matplotlib; matplotlib.use('Agg')
 from matplotlib.figure import Figure
 
 from jopy.recip.mechanisms import RecipExplicit, RecipImplicit, RecipBase
