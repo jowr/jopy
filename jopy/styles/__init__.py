@@ -1,7 +1,7 @@
 
 import matplotlib.pyplot as plt 
 
-from .plots import Figure
+from jopy.styles.plots import Figure
 
 def get_figure(orientation='landscape',width=110,fig=None,axs=False):
     """Creates a figure with some initial properties
@@ -67,7 +67,10 @@ def plot_axis(data,kind,ax=None):
 
 
 if __name__ == "__main__":
-    from jopy.styles.mplib import IpuStyle
-    line_fig,map_fig = IpuStyle()._show_info()
-    line_fig.savefig("IpuStyle_lines.pdf")
-    map_fig.savefig("IpuStyle_maps.pdf")
+    from jopy.utils import module_class_dict
+    import jopy.styles.mplib as mpl
+    dic = module_class_dict(mpl)
+    for i in dic:
+        line_fig,map_fig = dic[i]()._show_info()
+        line_fig.savefig(i+"_lines.pdf")
+        map_fig.savefig(i+"_maps.pdf")

@@ -7,6 +7,9 @@ from jopy.recip.mechanisms import RecipExplicit, RecipImplicit, RecipBase
 import numpy as np
 from jopy.styles.mplib import BaseStyle, DtuStyle, IpuStyle
 
+from jopy.utils import module_class_dict
+import jopy.styles.mplib as mpl
+
 LOCAL=True
 
 
@@ -57,14 +60,15 @@ class TestJopyStyle(object):
 
     @classmethod
     def setup_class(cls):
-        TestJopyStyle.objs.append(BaseStyle())
-        TestJopyStyle.objs.append(DtuStyle())
-        TestJopyStyle.objs.append(IpuStyle())
+        #TestJopyStyle.objs.append(BaseStyle())
+        #TestJopyStyle.objs.append(DtuStyle())
+        #TestJopyStyle.objs.append(IpuStyle())
         pass
 
     def test_style_show(self):
-        for obj in TestJopyStyle.objs:
-            line_fig,map_fig = obj._show_info(show=False)
+        dic = module_class_dict(mpl)
+        for i in dic:
+            line_fig,map_fig = dic[i]()._show_info(show=False)
             assert isinstance(line_fig, Figure)
             assert isinstance(map_fig, Figure)
 

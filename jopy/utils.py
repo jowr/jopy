@@ -4,6 +4,39 @@ from __future__ import print_function, division
 import numpy as np
 from numpy import pi,e
 
+def module_class_dict(mod):
+    """Get all classes from a module in a dict with the names
+     
+    Parameters
+    ----------
+    mod : Python module
+        The module to extract the classes from.
+         
+    """
+    mod_name = str(mod).split("'")[1]
+    ret = {}
+    for name, cls in mod.__dict__.items():
+        if isinstance(cls, type):
+            if mod_name in str(cls):
+                ret[name] = cls
+    return ret
+    
+# def module_class_dict(mod):
+#     """
+#     Returns a list of names of the abstract base
+#     classes that should not be instantiated. Can
+#     be used to build an ignore list.
+#     """
+#     mod_name = str(mod).split("'")[1]
+#     print(mod_name)
+#     ignList = {}
+#     for i in inspect.getmembers(mod):
+#         if inspect.isclass(i[1]):
+#             ignList[i[0]] = i[1]
+#     return ignList
+
+    #dict([(name, cls) for name, cls in mod.__dict__.items() if isinstance(cls, type)])
+
 def transition_factor(start=0.25, stop=0.75, position=0.5, order=2):
     """Weighting factor for smooth transition (from 0 to 1)
     
