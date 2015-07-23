@@ -2,13 +2,9 @@
 
 REM Command file for Sphinx documentation
 
-if "%SPHINXBUILD%" == "" (
-REM	set SPHINXBUILD=sphinx-build
-set SPHINXBUILD=pushd "%~dp0"
-call "%~f0" apidoc
-popd
-sphinx-build
-)
+REM if "%SPHINXBUILD%" == "" (
+set SPHINXBUILD=sphinx-build
+REM )
 set BUILDDIR=_build
 set ALLSPHINXOPTS=-d %BUILDDIR%/doctrees %SPHINXOPTS% .
 set I18NSPHINXOPTS=%SPHINXOPTS% .
@@ -66,6 +62,7 @@ if errorlevel 9009 (
 
 if "%1" == "html" (
 	call :apidoc
+    echo.%SPHINXBUILD% -b html %ALLSPHINXOPTS% %BUILDDIR%/html
 	%SPHINXBUILD% -b html %ALLSPHINXOPTS% %BUILDDIR%/html
 	if errorlevel 1 exit /b 1
 	echo.
@@ -267,14 +264,13 @@ if "%1" == "pseudoxml" (
 goto end
 
 :apidoc
-REM if "%1" == "apidoc" (
-	pushd "%~dp0"\..
-	sphinx-apidoc -fM -o docs\code jopy 
-	if errorlevel 1 exit /b 1
-	popd
-	echo.
-	echo.Build finished. Output of sphinx-apidoc is in docs/code.
-	goto :eof 
-REM )
+pushd "%~dp0"\.. 
+sphinx-apidoc -fM -o docs\code jopy 
+if errorlevel 1 exit /b 1
+popd
+echo.
+echo.Build finished. Output of sphinx-apidoc is in docs/code.
+goto :eof 
+
 	
 :end

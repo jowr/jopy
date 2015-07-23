@@ -28,8 +28,8 @@ def _lmtd_libpf(Delta_T1, Delta_T2, deadBand=0.1):
     both end. It is a relatively robust solution that also
     is used in libpf for process simulations.
     
-    Parameters:
-    -----------
+    Parameters
+    ----------
     Delta_T1 : scalar or array_like
         Temperature difference on one side of the heat exchanger        
     Delta_T2 : scalar or array_like
@@ -37,8 +37,8 @@ def _lmtd_libpf(Delta_T1, Delta_T2, deadBand=0.1):
     deadBand : scalar or array_like
         Absolute temperature difference that is considered to be 0.0 K
         
-    Returns:
-    --------
+    Returns
+    -------
     scalar or array_like
         The calculated logarithmic mean temperature difference
     
@@ -75,19 +75,19 @@ def _lmtd_jopy(Delta_T1, Delta_T2, dead_band=0.1):
     difference as calculated from temperature differences at
     both end. 
     
-    Parameters:
-    -----------
-        Delta_T1 : scalar or array_like
-            Temperature difference on one side of the heat exchanger        
-        Delta_T2 : scalar or array_like
-            Temperature difference on the other side of the heat exchanger 
-        dead_band : scalar or array_like
-            Absolute temperature difference that is considered to be 0.0 K
+    Parameters
+    ----------
+    Delta_T1 : scalar or array_like
+        Temperature difference on one side of the heat exchanger        
+    Delta_T2 : scalar or array_like
+        Temperature difference on the other side of the heat exchanger 
+    dead_band : scalar or array_like
+        Absolute temperature difference that is considered to be 0.0 K
         
-    Returns:
-    --------
-        scalar or array_like
-            The calculated logarithmic mean temperature difference
+    Returns
+    -------
+    scalar or array_like
+        The calculated logarithmic mean temperature difference
     
     """
     Delta_T1       = np.asarray(Delta_T1)
@@ -116,19 +116,19 @@ def lmtd(Delta_T1, Delta_T2, dead_band=0.1):
     difference as calculated from temperature differences at
     both end. 
     
-    Parameters:
-    -----------
-        Delta_T1 : scalar or array_like
-            Temperature difference on one side of the heat exchanger        
-        Delta_T2 : scalar or array_like
-            Temperature difference on the other side of the heat exchanger 
-        dead_band : scalar or array_like
-            Absolute temperature difference that is considered to be the minimum
+    Parameters
+    ----------
+    Delta_T1 : scalar or array_like
+        Temperature difference on one side of the heat exchanger        
+    Delta_T2 : scalar or array_like
+        Temperature difference on the other side of the heat exchanger 
+    dead_band : scalar or array_like
+        Absolute temperature difference that is considered to be the minimum
         
-    Returns:
-    --------
-        array_like
-            The calculated logarithmic mean temperature difference
+    Returns
+    -------
+    array_like
+        The calculated logarithmic mean temperature difference
             
     Please see :py:func:`._lmtd_jopy` for more documentation.
     

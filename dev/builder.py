@@ -14,6 +14,7 @@ import sys
 
 template_dir = os.path.dirname(os.path.abspath(__file__))
 target_dir = os.path.abspath(os.path.join(os.path.dirname(__file__),'..'))
+docs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__),'..','docs'))
 
 author = 'Jorrit Wronski'
 email = 'jopy@jorrit.org'
@@ -43,12 +44,15 @@ else:
 #print(str(conda_api.get_conda_version()))
 #print(str(conda_api.search(spec='ipython')))
  
-def run_command(cmd):
+def run_command(cmd, **kwargs):
     '''given shell command, returns communication tuple of stdout and stderr'''
-    return subprocess.Popen(cmd, 
-                            stdout=subprocess.PIPE, 
-                            stderr=subprocess.PIPE, 
-                            stdin=subprocess.PIPE).communicate()
+    kw = dict(stdout=subprocess.PIPE, 
+              stderr=subprocess.PIPE, 
+              stdin=subprocess.PIPE)
+    kw.update(**kwargs)
+    return subprocess.Popen(cmd,**kwargs).communicate()
+
+
 def find_packages(full):
     """Searches binstar for packages"""
     con_pkgs = []
@@ -255,12 +259,9 @@ f.close()
 
 
 
-
-
-
-
-
-
+# Build the docs automatically
+#print(run_command(["make","html"], shell=True, cwd=docs_dir)[0].decode("utf-8"))
+print(run_command(["make","html"], shell=True, cwd=docs_dir))
 
 
 #target = 'meta.yaml'

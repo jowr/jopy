@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, division
 
+from ..base import JopyBaseClass
+
 import numpy as np
 from numpy import pi
 from texttable import Texttable
 from scipy.optimize._minimize import minimize_scalar
-
-from ..base import JopyBaseClass
 from abc import ABCMeta, abstractmethod
 from scipy.optimize import minimize
 
@@ -37,14 +37,21 @@ class RecipBase(JopyBaseClass):
         """ 
         Update the geometric variables and perform some calculations.
         
-        cr : crankshaft radius [m]
-        cl : conrod length [m]
-        bo : bore [m]
-        pp : piston pin offset [m]
-        cv : clearance volume at TDC in [m3]
-        of : offset for the crank angle position [boolean]
-             Allow for theta_TDC other than 0. If false (theta_TDC = 0)
-             is assured by precalculating the angular offset.
+        cr : float
+            crankshaft radius [m]
+        cl : float
+            conrod length [m]
+        bo : float
+            bore [m]
+        pp : float
+            piston pin offset [m]
+        cv : float
+            clearance volume at TDC in [m3]
+        of : float
+            offset for the crank angle position [boolean]
+            Allow for theta_TDC other than 0. If false (theta_TDC = 0)
+            is assured by precalculating the angular offset.
+             
         """
         self._cr = cr
         self._cl = cl
@@ -227,14 +234,20 @@ class RecipExplicit(RecipBase):
         """ 
         Update the geometric variables and perform some calculations.
         
-        cr : crankshaft radius [m]
-        cl : conrod length [m]
-        bo : bore [m]
-        pp : piston pin offset [m]
-        cv : clearance volume at TDC in [m3]
-        of : offset for the crank angle position [boolean]
-             Allow for theta_TDC other than 0. If false (theta_TDC = 0)
-             is assured by precalculating the angular offset.
+        cr : float
+            crankshaft radius [m]
+        cl : float
+            conrod length [m]
+        bo : float
+            bore [m]
+        pp : float
+            piston pin offset [m]
+        cv : float
+            clearance volume at TDC in [m3]
+        of : float
+            offset for the crank angle position [boolean]
+            Allow for theta_TDC other than 0. If false (theta_TDC = 0)
+            is assured by precalculating the angular offset.
         """
         super(RecipExplicit, self).set_geometry(cr,cl,bo,pp,cv,of)
         # Dimensionless properties

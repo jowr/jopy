@@ -2,6 +2,8 @@
 from __future__ import print_function, division
 
 from ..base import JopyBaseClass
+
+
 import matplotlib as mpl
 import matplotlib.cm as mplcm
 import numpy as np
@@ -132,8 +134,12 @@ class BaseStyle(JopyBaseClass):
 
 
     def cycle_to_list(self, cyc):
-        """Takes a cycle object and extract elements until
-        it receives and object that has been extracted before"""
+        """Convert a cycle to a list of unique entries
+        
+        Takes a cycle object and extract elements until
+        it receives and object that has been extracted before
+        
+        """
         lst = []
         while True:
             obj = next(cyc)
@@ -182,7 +188,9 @@ class BaseStyle(JopyBaseClass):
         """A function to create and register the custom colour map objects 
         in a way matplotlib can digest. The cubehelix (including Kindl et al., 
         the Brewer3 colour maps (YlOrRd, PuBuGn, YlGnBu) all provide proper 
-        desaturation in grey-scale."""
+        desaturation in grey-scale.
+        
+        """
         specs = {}
         # We start out with the custom cubehelix maps
         #========= =======================================================
@@ -522,7 +530,11 @@ class BaseStyle(JopyBaseClass):
 
     def color_cycle(self, name='map', cmap=None, length=None):
         '''Returns the current colour cycle, creates a new one if necessary.
-        name: selector for colour cycle
+        
+        Parameters
+        ----------
+        name : str
+            selector for colour cycle:
             'cmap': use a colourmap to generate cycle, see http://matplotlib.org/1.2.1/examples/pylab_examples/show_colormaps.html
             'DTU': uses the colours from the DTU design guide
             'DTU_dark': uses the colours from the DTU design guide, darker colours first, good for presentations
@@ -530,6 +542,7 @@ class BaseStyle(JopyBaseClass):
             'matplotlib': The standard matplotlib scheme
             'simple': A simple four-colour scheme that work for greyscale and colourblind people
             'brewer1' and 'brewer2': See http://colorbrewer2.org, works for colourblind and greyscale
+            
         '''
         if name=='map':
             if length is None: length = self.default_lst

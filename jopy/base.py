@@ -8,7 +8,8 @@ class JopyBaseClass(object):
     basic functionality for debugging and exception handling.
     """     
     def __init__(self):
-        """Summary line.
+        """:noindex:
+        Summary line.
 
         Extended description of function, just a usage example 
         for the NumPy style docstrings. See also: 

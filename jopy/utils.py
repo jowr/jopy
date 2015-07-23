@@ -48,8 +48,8 @@ def transition_factor(start=0.25, stop=0.75, position=0.5, order=2):
     an order higher than 2, the generalised logistic function [2] will be
     used to calculated the transition curve.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     start : float
         start of transition interval; default 0.25
     stop : float 
@@ -59,20 +59,24 @@ def transition_factor(start=0.25, stop=0.75, position=0.5, order=2):
     order : integer
         Smooth up to which derivative?; default 2
 
-    Returns:
-    --------
-    float : 
+    Returns
+    -------
+    float  
         smooth transition between 0 and 1 from start to stop [-]
         
     
     Use tFactor in an equation like this:
     tFactor = transition_factor(start=start,stop=stop,position=position);
     smoothed = tFactor*1stValue + (1 - tFactor)*2ndValue;
+    
+    References
+    ----------
 
     [1] Christoph C Richter, Proposal of New Object-Oriented Equation-Based Model
         Libraries for Thermodynamic Systems, PhD thesis, Technical University
         Carolo-Wilhelmina Braunschweig, 2008
     [2] Generalised logistic function on http://en.wikipedia.org/wiki/Generalised_logistic_function
+    
     """
     a_map = [-1./2., -2./pi, -3./4., -8./pi] #First parameters
     b_map = [ 1./2.,  1./2.,  1./2.,  1./2.] #Second parameters
@@ -153,5 +157,7 @@ def transition_factor(start=0.25, stop=0.75, position=0.5, order=2):
 
 
 def transition_factor_alt(center = 0.5, length = 1.0, position = 0.0, order = 2):
-    """Please see :py:func:`.transition_factor` for documentation"""    
+    """Please see :py:func:`.transition_factor` for documentation
+    
+    """
     return transition_factor(start=center-0.5*length, stop=center+0.5*length, position=position, order=order)

@@ -1,7 +1,7 @@
 
 import matplotlib.pyplot as plt 
 
-from jopy.styles.plots import Figure
+from .plots import Figure
 
 def get_figure(orientation='landscape',width=110,fig=None,axs=False):
     """Creates a figure with some initial properties
