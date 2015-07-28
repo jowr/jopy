@@ -6,31 +6,13 @@ class JopyBaseClass(object):
     
     The mother of all classes in the jopy module. Implements 
     basic functionality for debugging and exception handling.
+    
+    Extended description of function, just a usage example 
+    for the NumPy style docstrings. See also: 
+    http://sphinx-doc.org/ext/example_numpy.html#example-numpy
+    
     """     
     def __init__(self):
-        """:noindex:
-        Summary line.
-
-        Extended description of function, just a usage example 
-        for the NumPy style docstrings. See also: 
-        http://sphinx-doc.org/ext/example_numpy.html#example-numpy
-        
-        The mother of all classes in the jopy module. Implements 
-        basic functionality for debugging and exception handling.
-        
-        Parameters
-        ----------
-        arg1 : int
-            Description of arg1
-        arg2 : str
-            Description of arg2
-        
-        Returns
-        -------
-        bool
-            Description of return value
-        
-        """
         self.DEBUG = False
          
     @property
