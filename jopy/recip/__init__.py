@@ -12,7 +12,7 @@ if __name__ == "__main__":
     cr = 0.05
     cl = 0.1
     bo = 0.1
-    pp = 0.8*cr
+    pp = 0.75*cr
     cv = 20e-6
     me.set_geometry(cr, cl, bo, pp, cv)
     metoo.set_geometry(cr, cl, bo, pp, cv)
@@ -33,8 +33,8 @@ if __name__ == "__main__":
     print("{0:8.2f} : {1:8.2f}".format(np.degrees(metoo._theta_0_TDC), np.degrees(metoo._theta_0_BDC)))
     print("{0:8.2f} : {1:8.2f}".format(np.degrees(me.TDC()),    np.degrees(me.BDC())))
     print("{0:8.2f} : {1:8.2f}".format(np.degrees(metoo.TDC()), np.degrees(metoo.BDC())))
-    print("{0:8.2f} : {1:8.2f}".format(np.degrees(me._l_max),    np.degrees(me._l_min)))
-    print("{0:8.2f} : {1:8.2f}".format(np.degrees(metoo._l_max), np.degrees(metoo._l_min)))
+    print("{0:8.4f} : {1:8.4f}".format(me._l_cr_max,    me._l_cr_min))
+    print("{0:8.4f} : {1:8.4f}".format(metoo._l_cr_max, metoo._l_cr_min))
     print("{0:8.4f} : {1:8.4f}".format(np.min(pos),   np.max(pos)))
     print("{0:8.4f} : {1:8.4f}".format(np.min(postoo),np.max(postoo)))
     #print(pi)    

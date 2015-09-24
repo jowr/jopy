@@ -21,17 +21,17 @@ class RecipBase(JopyBaseClass):
         self._cl = None # conrod length
         self._bo = None # bore
         self._pp = None # piston pin offset
-        # Calculated values        
+        # Calculated values
         self._A_piston = None 
         self._l_tdc    = None
         # Angle values used for offset calculations
         self._theta_0_TDC = None
         self._theta_0_BDC = None
         # Distances from crankshaft to piston pin
-        self._l_max = None
-        self._l_min = None 
+        self._l_cr_max = None
+        self._l_cr_min = None 
         # Determines whether to use offset or not
-        self._of = None        
+        self._of = None
     
     def set_geometry(self,cr,cl,bo,pp=0,cv=0,of=False):
         """ 
@@ -64,8 +64,8 @@ class RecipBase(JopyBaseClass):
         self._theta_0_TDC = self._calc_theta_0_TDC()
         self._theta_0_BDC = self._calc_theta_0_BDC()
         # Distances from crankshaft to piston pin
-        self._l_max = self._calc_l_max()
-        self._l_min = self._calc_l_min()
+        self._l_cr_max = self._calc_l_cr_max()
+        self._l_cr_min = self._calc_l_cr_min()
         # Determines whether to use offset or not
         self._of = of
         
@@ -74,9 +74,9 @@ class RecipBase(JopyBaseClass):
     @abstractmethod
     def _calc_theta_0_BDC(self): raise NotImplementedError("Missing function")
     @abstractmethod
-    def _calc_l_max(self): raise NotImplementedError("Missing function")
+    def _calc_l_cr_max(self): raise NotImplementedError("Missing function")
     @abstractmethod
-    def _calc_l_min(self): raise NotImplementedError("Missing function")
+    def _calc_l_cr_min(self): raise NotImplementedError("Missing function")
     @abstractmethod
     def _calc_distance_to_shaft(self,_theta_0): raise NotImplementedError("Missing function")
     @abstractmethod
@@ -101,7 +101,7 @@ class RecipBase(JopyBaseClass):
     
     def stroke(self):
         """Stroke length of the current geometry"""
-        return np.abs(self._l_max-self._l_min)
+        return np.abs(self._l_cr_max-self._l_cr_min)
        
     def TDC(self):
         return self._calc_theta_0(-self._theta_0_TDC)
@@ -258,11 +258,11 @@ class RecipExplicit(RecipBase):
         self._sigma = pp / cl
         self._lambda = cr / cl    
     
-    def _calc_l_max(self):
+    def _calc_l_cr_max(self):
         """Calculate the distance from crankshaft to piston at TDC"""
         return np.sqrt(np.power(self._cl+self._cr,2.0)-np.power(self._pp,2.0))
 
-    def _calc_l_min(self):
+    def _calc_l_cr_min(self):
         """Calculate the distance from crankshaft to piston at BDC"""
         return np.sqrt(np.power(self._cl-self._cr,2.0)-np.power(self._pp,2.0))
     
@@ -280,7 +280,15 @@ class RecipExplicit(RecipBase):
     
     def _calc_distance_to_head(self,_theta_0):
         """Calculate the distance from cylinder head to piston pin"""
-        return self._l_max-self._calc_distance_to_shaft(_theta_0)+self._l_tdc
+        return self._l_cr_max-self._calc_distance_to_shaft(_theta_0)+self._l_tdc
+    
+    def _calc_theta_from_distance_to_shaft(self,_pos_shaft): 
+        raise NotImplementedError("Missing function")
+    
+    def _calc_theta_from_distance_to_head(self,_pos_head): 
+        raise NotImplementedError("Missing function")
+    
+    
        
 
     
@@ -293,25 +301,19 @@ class RecipImplicit(RecipBase):
     def _beta(self,_theta_0):
         """Conrod angle"""
         return (self._pp+self._cr*np.sin(_theta_0))/self._cl
-    
-    def _position(self,_theta_0):
-        """Piston position from TDC"""
-        return np.sqrt(np.power(self._cl+self._cr,2.0)-np.power(self._pp,2.0))-self._cl*np.cos(self._beta(-_theta_0 + pi))+self._cr*np.cos(-_theta_0 + pi)
-    
-    def _calc_l_max(self):
-        """Calculate the distance from crankshaft to piston at TDC"""
-        #return None # np.sqrt(np.power(self._cl+self._cr,2.0)-np.power(self._pp,2.0))
-        return self._position(self._theta_0_TDC)
 
-    def _calc_l_min(self):
+    def _calc_l_cr_max(self):
+        """Calculate the distance from crankshaft to piston at TDC"""
+        return np.sin(self._theta_0_TDC+0.5*pi) * (self._cl + self._cr)
+
+    def _calc_l_cr_min(self):
         """Calculate the distance from crankshaft to piston at BDC"""
-        #return None # np.sqrt(np.power(self._cl-self._cr,2.0)-np.power(self._pp,2.0))
-        return self._position(self._theta_0_BDC)
+        return np.cos(pi-self._theta_0_BDC) * (self._cl - self._cr)
     
     def _calc_theta_0_TDC(self):
         """Calculate the crankshaft angle at TDC"""
         # SciPy for scalar functions
-        def f(x): return self._position(x)
+        def f(x): return self._calc_distance_to_head(x)
         res = minimize_scalar(f, bounds=(-0.5*pi, 0.5*pi), method='bounded')
         self.autolog(str(res))
         return res.x
@@ -319,19 +321,18 @@ class RecipImplicit(RecipBase):
     def _calc_theta_0_BDC(self):
         """Calculate the crankshaft angle at BDC"""
         # SciPy for scalar functions
-        def f(x): return -self._position(x)
+        def f(x): return -self._calc_distance_to_head(x)
         res = minimize_scalar(f, bounds=(0.5*pi, 1.5*pi), method='bounded')
         self.autolog(str(res))
         return res.x
     
     def _calc_distance_to_shaft(self,_theta_0):
         """Calculate the distance from crankshaft centre to piston pin"""
-        raise NotImplementedError("Crankshaft distance is not available.")
+        return self._l_cr_max - (self._calc_distance_to_head(_theta_0) - self._l_tdc)
     
     def _calc_distance_to_head(self,_theta_0):
         """Calculate the distance from cylinder head to piston pin"""
-        return -self._l_max + self._position(_theta_0) + self._l_tdc
-        #return self._l_max-self._calc_distance_to_shaft(_theta)+self._l_tdc
+        return np.sqrt(np.power(self._cl+self._cr,2.0)-np.power(self._pp,2.0))-self._cl*np.cos(self._beta(-_theta_0 + pi))+self._cr*np.cos(-_theta_0 + pi) + self._l_tdc
 
 
    
