@@ -81,14 +81,14 @@ class RecipBase(JopyBaseClass):
     def _calc_distance_to_shaft(self,_theta_0): raise NotImplementedError("Missing function")
     @abstractmethod
     def _calc_distance_to_head(self,_theta_0): raise NotImplementedError("Missing function")
-    @abstractmethod
-    def _calc_theta_from_distance_to_shaft(self,_pos): raise NotImplementedError("Missing function")
-    @abstractmethod
-    def _calc_theta_from_distance_to_head(self,_pos): raise NotImplementedError("Missing function")
+    #@abstractmethod
+    #def _calc_theta_from_distance_to_shaft(self,_pos): raise NotImplementedError("Missing function")
+    #@abstractmethod
+    #def _calc_theta_from_distance_to_head(self,_pos): raise NotImplementedError("Missing function")
     
     def _calc_theta_0(self,theta):
         """Check whether the crankshaft angle input needs preprocessing or not"""
-        if not self._of: return theta + self._theta_TDC
+        if not self._of: return theta + self._theta_0_TDC
         else: return theta
     
     def calc_distance_to_shaft(self,theta): 

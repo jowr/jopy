@@ -29,8 +29,8 @@ if __name__ == "__main__":
     #plot(fultoo,postoo,':')
     
     print("  TDC :  BDC ")
-    print("{0:8.2f} : {1:8.2f}".format(np.degrees(me._theta_TDC),    np.degrees(me._theta_BDC)))
-    print("{0:8.2f} : {1:8.2f}".format(np.degrees(metoo._theta_TDC), np.degrees(metoo._theta_BDC)))
+    print("{0:8.2f} : {1:8.2f}".format(np.degrees(me._theta_0_TDC),    np.degrees(me._theta_0_BDC)))
+    print("{0:8.2f} : {1:8.2f}".format(np.degrees(metoo._theta_0_TDC), np.degrees(metoo._theta_0_BDC)))
     print("{0:8.2f} : {1:8.2f}".format(np.degrees(me.TDC()),    np.degrees(me.BDC())))
     print("{0:8.2f} : {1:8.2f}".format(np.degrees(metoo.TDC()), np.degrees(metoo.BDC())))
     print("{0:8.2f} : {1:8.2f}".format(np.degrees(me._l_max),    np.degrees(me._l_min)))
