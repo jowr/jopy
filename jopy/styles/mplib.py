@@ -14,6 +14,7 @@ import sys
 import platform
 
 class BaseStyle(JopyBaseClass):
+    
     default_map = "cubehelix_kindl"
     default_lst = 4
     
@@ -171,8 +172,9 @@ class BaseStyle(JopyBaseClass):
         return cc.to_rgb(inp) 
 
 
-    def get_color_map(self,name=default_map,reverse=False):
+    def get_color_map(self,name=None,reverse=False):
         """A function to get a matplotlib colour map by name"""
+        if name is None: name = self.default_map        
         if name.endswith('_r'):
             name = name[:-2] # remove "_r"
             reverse = not reverse
@@ -696,7 +698,8 @@ class IpuStyle(BaseStyle):
           (114./255. , 121./255. , 126./255.),
           ( 91./255. , 172./255. ,  38./255.),
           (217./255. , 220./255. , 222./255.),
-          (255./255. , 255./255. , 255./255.)]
+          (255./255. , 255./255. , 255./255.)
+          ]
 
         # create map and register it together with reversed colours
         maps = []
@@ -723,6 +726,9 @@ class IpuStyle(BaseStyle):
 
 
 class VdgStyle(BaseStyle):
+    
+    default_map = "VDG"
+
     def __init__(self):
         BaseStyle.__init__(self)
         mpl.rcParams['lines.linewidth'] = 1.25     # line width in points
@@ -750,6 +756,25 @@ class VdgStyle(BaseStyle):
         #preamble.append(r'\sansmath')
         #preamble.append(r'\renewcommand*{\familydefault}{\sfdefault}')
         return preamble 
+    
+    def _register_color_maps(self):
+        BaseStyle._register_color_maps(self)
+        rgb = [
+          ( 25./255. ,  13./255. ,  25./255.),
+          (  0./255. ,  51./255. , 102./255.),     
+          #(205./255. ,  51./255. ,  51./255.),
+          (  0./255. , 109./255. , 148./255.),
+          (127./255. , 186./255. ,  50./255.),
+          (255./255. , 255./255. , 255./255.)]
+
+        # create map and register it together with reversed colours
+        maps = []
+        maps.append(LinearSegmentedColormap.from_list('VDG'  , rgb))
+        maps.append(LinearSegmentedColormap.from_list('VDG_r', rgb[::-1]))
+    
+        for cmap in maps:
+            mplcm.register_cmap(cmap=cmap)
+            self._color_maps[cmap.name] = cmap
 
     def _register_color_lists(self, length=BaseStyle.default_lst):
         BaseStyle._register_color_lists(self)
