@@ -19,8 +19,8 @@ if __name__ == "__main__":
     
     full = me.revolution(1000)
     
-    pos = me.calc_distance_to_head(full)
-    postoo = metoo.calc_distance_to_head(full)
+    pos = me.l(full)
+    postoo = metoo.l(full)
     #fultoo = metoo._calc_theta_from_distance(postoo)
     
     #plt.figure()
@@ -29,12 +29,12 @@ if __name__ == "__main__":
     #plot(fultoo,postoo,':')
     
     print("  TDC :  BDC ")
-    print("{0:8.2f} : {1:8.2f}".format(np.degrees(me._theta_0_TDC),    np.degrees(me._theta_0_BDC)))
-    print("{0:8.2f} : {1:8.2f}".format(np.degrees(metoo._theta_0_TDC), np.degrees(metoo._theta_0_BDC)))
+    print("{0:8.2f} : {1:8.2f}".format(np.degrees(me.theta_0_TDC),    np.degrees(me.theta_0_BDC)))
+    print("{0:8.2f} : {1:8.2f}".format(np.degrees(metoo.theta_0_TDC), np.degrees(metoo.theta_0_BDC)))
     print("{0:8.2f} : {1:8.2f}".format(np.degrees(me.TDC()),    np.degrees(me.BDC())))
     print("{0:8.2f} : {1:8.2f}".format(np.degrees(metoo.TDC()), np.degrees(metoo.BDC())))
-    print("{0:8.4f} : {1:8.4f}".format(me._l_cr_max,    me._l_cr_min))
-    print("{0:8.4f} : {1:8.4f}".format(metoo._l_cr_max, metoo._l_cr_min))
+    print("{0:8.4f} : {1:8.4f}".format(me.l_cr_max,    me.l_cr_min))
+    print("{0:8.4f} : {1:8.4f}".format(metoo.l_cr_max, metoo.l_cr_min))
     print("{0:8.4f} : {1:8.4f}".format(np.min(pos),   np.max(pos)))
     print("{0:8.4f} : {1:8.4f}".format(np.min(postoo),np.max(postoo)))
     #print(pi)    
@@ -44,14 +44,23 @@ if __name__ == "__main__":
         pp = p*cr
         me.set_geometry(cr, cl, bo, pp, cv)
         metoo.set_geometry(cr, cl, bo, pp, cv)
-        diff = (me.volume(full)-metoo.volume(full))/metoo.volume(full)*100.0
+        diff = (me.V(full)-metoo.V(full))/metoo.V(full)*100.0
         plt.plot(full,diff,label=str(p)+": (Dubbel-Bjarne)/Bjarne")
-        
     plt.legend(loc=3)
     
     plt.figure()
-    plt.plot(full,me.volume(full)*1e6,label='Dubbel')
-    plt.plot(full,metoo.volume(full)*1e6,label='Bjarne')
+    plt.plot(full,me.V(full)*1e6,label='Dubbel')
+    plt.plot(full,metoo.V(full)*1e6,label='Bjarne')
+    plt.legend(loc=3)
+    
+    plt.figure()
+    #plt.plot(full,me.V(full)*1e6,label='Dubbel')
+    plt.plot(full,metoo.dVdtheta(full)*1e6,label='Bjarne')
+    plt.legend(loc=3)
+    
+    plt.figure()
+    #plt.plot(full,me.V(full)*1e6,label='Dubbel')
+    plt.plot(full,metoo.d2Vdtheta2(full)*1e6,label='Bjarne')
     plt.legend(loc=3)
     
     plt.show()

@@ -6,11 +6,16 @@ from ..base import JopyBaseClass
 import numpy as np
 from numpy import pi
 from texttable import Texttable
-from scipy.optimize._minimize import minimize_scalar
+from scipy.optimize import minimize, minimize_scalar
 from abc import ABCMeta, abstractmethod
-from scipy.optimize import minimize
 
 class RecipBase(JopyBaseClass):
+    """
+    The basic object that handles many tasks for the reciprocating 
+    machine. It exploits as many interelations as possible and the 
+    object can be optimised heavily by using explicit equations
+    instead of the solver calls.
+    """
     
     __metaclass__ = ABCMeta
     
@@ -21,22 +26,137 @@ class RecipBase(JopyBaseClass):
         self._cl = None # conrod length
         self._bo = None # bore
         self._pp = None # piston pin offset
-        # Calculated values
-        self._A_piston = None 
-        self._l_tdc    = None
         # Angle values used for offset calculations
         self._theta_0_TDC = None
         self._theta_0_BDC = None
-        # Distances from crankshaft to piston pin
-        self._l_cr_max = None
-        self._l_cr_min = None 
         # Determines whether to use offset or not
         self._of = None
+        # Other variables used to save calculation time
+        self._l_min    = None # clearance from dead volume
+        self._l_max    = None 
+        self._l_cr_max = None
+        self._l_cr_min = None
+        
+        
+        
+    @property
+    def cr(self):
+        """Crankshaft radius [m]"""
+        return self._cr
+
+    #@cr.setter
+    #def cr(self, value):
+    #    self._cr = value
+    #
+    #@cr.deleter
+    #def cr(self):
+    #    del self._cr
+
+
+    @property
+    def cl(self):
+        """Conrod length [m]"""
+        return self._cl
+
+    #@cl.setter
+    #def cl(self, value):
+    #    self._cl = value
+    #
+    #@cl.deleter
+    #def cl(self):
+    #    del self._cl
+
+
+    @property
+    def bo(self):
+        """Cylinder bore (diameter) [m]"""
+        return self._bo
+
+    #@bo.setter
+    #def bo(self, value):
+    #    self._bo = value
+    #
+    #@bo.deleter
+    #def bo(self):
+    #    del self._bo
+
+
+    @property
+    def pp(self):
+        """Piston pin offset from crankshaft centre [m]"""
+        return self._pp
+
+    #@pp.setter
+    #def pp(self, value):
+    #    self._pp = value
+    #
+    #@pp.deleter
+    #def pp(self):
+    #    del self._pp
+    
+    @property
+    def l_min(self):
+        """Clearance height at TDC/minimum volume [m]"""
+        if self._l_min is None: self._l_min = self._calc_distance_to_head(self.theta_0_TDC)
+        return self._l_min
+    
+    @property
+    def l_max(self):
+        """Clearance height at BDC/maximum volume [m]"""
+        if self._l_max is None: self._l_max = self._calc_distance_to_head(self.theta_0_BDC)
+        return self._l_max
+    
+    @property
+    def l_cr_min(self):
+        """Clearance height at TDC/minimum volume [m]"""
+        if self._l_cr_min is None: self._l_cr_min = self._calc_distance_to_shaft(self.theta_0_BDC)
+        return self._l_cr_min
+    
+    @property
+    def l_cr_max(self):
+        """Clearance height at TDC/minimum volume [m]"""
+        if self._l_cr_max is None: self._l_cr_max = self._calc_distance_to_shaft(self.theta_0_TDC)
+        return self._l_cr_max
+
+
+    @property
+    def theta_0_TDC(self):
+        """Crankshaft angle at TDC without offset [rad] - 0 = crankshaft top, not TDC"""
+        if self._theta_0_TDC is None: self._theta_0_TDC = self._calc_theta_0_TDC()
+        return self._theta_0_TDC
+
+    #@theta_0_TDC.setter
+    #def theta_0_TDC(self, value):
+    #    self._theta_0_TDC = value
+    #
+    #@theta_0_TDC.deleter
+    #def theta_0_TDC(self):
+    #    del self._theta_0_TDC
+
+
+    @property
+    def theta_0_BDC(self):
+        """Crankshaft angle at BDC without offset [rad] - pi = crankshaft bottom, not BDC"""
+        if self._theta_0_BDC is None: self._theta_0_BDC = self._calc_theta_0_BDC()
+        return self._theta_0_BDC
+
+    #@theta_0_BDC.setter
+    #def theta_0_BDC(self, value):
+    #    self._theta_0_BDC = value
+    #
+    #@theta_0_BDC.deleter
+    #def theta_0_BDC(self):
+    #    del self._theta_0_BDC
+    
+    
+
     
     def set_geometry(self,cr,cl,bo,pp=0,cv=0,of=False):
         """ 
         Update the geometric variables and perform some calculations.
         
+        Parameters
+        ----------
         cr : float
             crankshaft radius [m]
         cl : float
@@ -46,115 +166,180 @@ class RecipBase(JopyBaseClass):
         pp : float
             piston pin offset [m]
         cv : float
-            clearance volume at TDC in [m3]
+            clearance volume at TDC in [m³]
         of : float
             offset for the crank angle position [boolean]
             Allow for theta_TDC other than 0. If false (theta_TDC = 0)
             is assured by precalculating the angular offset.
-             
+            
         """
         self._cr = cr
         self._cl = cl
         self._bo = bo
         self._pp = pp
-        # Calculated values        
-        self._A_piston = pi * np.power(bo,2.0) / 4.0 # 
-        self._l_tdc    = cv / self._A_piston # distance from piston to head at TDC
         # Angle values used for offset calculations
-        self._theta_0_TDC = self._calc_theta_0_TDC()
-        self._theta_0_BDC = self._calc_theta_0_BDC()
-        # Distances from crankshaft to piston pin
-        self._l_cr_max = self._calc_l_cr_max()
-        self._l_cr_min = self._calc_l_cr_min()
+        self._theta_0_TDC = None
+        self._theta_0_BDC = None
         # Determines whether to use offset or not
         self._of = of
+        # Other variables used to save calculation time
+        self._l_min    = cv / self.A() # distance from piston to head at TDC
+        self._l_max    = None 
+        self._l_cr_max = None
+        self._l_cr_min = None
         
-    @abstractmethod
-    def _calc_theta_0_TDC(self): raise NotImplementedError("Missing function")
-    @abstractmethod
-    def _calc_theta_0_BDC(self): raise NotImplementedError("Missing function")
-    @abstractmethod
-    def _calc_l_cr_max(self): raise NotImplementedError("Missing function")
-    @abstractmethod
-    def _calc_l_cr_min(self): raise NotImplementedError("Missing function")
-    @abstractmethod
-    def _calc_distance_to_shaft(self,_theta_0): raise NotImplementedError("Missing function")
-    @abstractmethod
-    def _calc_distance_to_head(self,_theta_0): raise NotImplementedError("Missing function")
-    #@abstractmethod
-    #def _calc_theta_from_distance_to_shaft(self,_pos): raise NotImplementedError("Missing function")
-    #@abstractmethod
-    #def _calc_theta_from_distance_to_head(self,_pos): raise NotImplementedError("Missing function")
-    
     def _calc_theta_0(self,theta):
-        """Check whether the crankshaft angle input needs preprocessing or not"""
-        if not self._of: return theta + self._theta_0_TDC
+        """Process the crankshaft angle input to yield a value without offset."""
+        if not self._of: return theta + self.theta_0_TDC
         else: return theta
+        
+    def _calc_theta(self,theta_0):
+        """Process the crankshaft angle input to yield a value with offset."""
+        if not self._of: return theta_0 - self.theta_0_TDC
+        else: return theta_0
     
-    def calc_distance_to_shaft(self,theta): 
-        """Calculate the distance from crankshaft centre to piston pin"""
-        return self._calc_distance_to_shaft(self._calc_theta_0(theta))
+    def _head_to_crank(self,position):
+        return self.l_cr_max - position + self.l_min
+        
+    def _crank_to_head(self,position):
+        return self.l_cr_max - position + self.l_min        
     
-    def calc_distance_to_head(self,theta): 
-        """Calculate the distance from cylinder head to piston pin"""
-        return self._calc_distance_to_head(self._calc_theta_0(theta))
+    @staticmethod
+    def _calc_dthetadt(rpm):
+        """Return the radians per time"""
+        return 2.0*pi*rpm/60.0
+    
+    def _calc_theta_bounds(self,TDCtoBDC=None,BDCtoTDC=None,dldtheta=None,dldt=None):
+        """Determine whether we travel from TDC to BDC or the other way."""
+        small = 1e-12
+        downstroke = None
+        if TDCtoBDC is not None:
+            downstroke = np.asanyarray(TDCtoBDC)*1. 
+        elif BDCtoTDC is not None:
+            downstroke = np.asanyarray(BDCtoTDC)*-1.
+        elif dldtheta is not None:
+            downstroke = np.asanyarray(dldtheta)*-1.
+        elif dldt is not None:
+            downstroke = np.asanyarray(dldt)*-1.
+        else:
+            self.autolog(str(TDCtoBDC))
+            self.autolog(str(BDCtoTDC))
+            self.autolog(str(dldtheta))
+            self.autolog(str(dldt))
+            raise ValueError("Unable to detect downstroke or upstroke.")
+        
+        goingdo = downstroke >  small
+        goingup = downstroke < -small
+        undefin = np.logical_not(np.logical_or(goingdo,goingup))
+        if np.sum(undefin)>0: 
+            self.autolog(str(TDCtoBDC))
+            self.autolog(str(BDCtoTDC))
+            self.autolog(str(dldtheta))
+            self.autolog(str(dldt))
+            raise ValueError("Unable to detect downstroke or upstroke, the derivative is close to zero.")
+                
+        ret = np.empty(downstroke.shape, dtype=(float,2))
+        ret[goingdo] = (        self.TDC(), self.BDC())
+        ret[goingup] = (-2.0*pi+self.BDC(), self.TDC())
+        return ret,goingdo,goingup
+
     
     def stroke(self):
         """Stroke length of the current geometry"""
-        return np.abs(self._l_cr_max-self._l_cr_min)
+        return self.l(self.BDC())-self.l(self.TDC())
        
     def TDC(self):
-        return self._calc_theta_0(-self._theta_0_TDC)
+        """Crankshaft angle at TDC"""
+        return self._calc_theta(self.theta_0_TDC)
     
     def BDC(self):
-        return self._calc_theta_0(self._theta_0_BDC-2.0*self._theta_0_TDC)
+        """Crankshaft angle at BDC"""
+        return self._calc_theta(self.theta_0_BDC)
     
-    def position(self,theta):
-        """Piston position from TDC + clearance height"""
-        return self.calc_distance_to_head(theta)
-    
-    def volume(self,theta):
-        """Volume in cylinder"""
-        return self.position(theta) * self._A_piston
-    
-    def calc_theta_from_position_single(self,position,afterTDC=True):
-        """Return the angle calculated from the piston position, 
-        the flag for afterTDC is needed because there are always 
-        two solutions."""
-        if afterTDC: 
-            boundaries = (self.TDC(), self.BDC())
-        else: 
-            boundaries = (-2.0*pi+self.BDC(), self.TDC())
-        def f(x): return np.power(position-self.position(x),2.0) 
-        res = minimize_scalar(f, bounds=boundaries, method='bounded')
+    # Mandatory functions needed to fill the geometry variables,
+    # the methods are abstract even though they have an implementation
+    # to force the user to actively reimplement the calls. This is
+    # done to draw attention to the fact the solvers are highly 
+    # inefficient. 
+    @abstractmethod
+    def _calc_theta_0_TDC(self):
+        """Calculate the crankshaft angle at TDC""" 
+        def f(x): return self._calc_distance_to_head(x)
+        res = minimize_scalar(f, bounds=(-0.5*pi, 0.5*pi), method='bounded')
         self.autolog(str(res))
         return res.x
     
-    def calc_theta_from_position_series(self,position,afterTDC=None):
-        """Return the angle calculated from a series of piston positions 
-        assuming evenly spaced points in terms of crank angle."""
-        elms = len(position)
-        if elms<1: 
-            raise ValueError("No element supplied")
-        elif elms==1: 
-            return self.calc_theta_from_position_single(position,afterTDC)
-        if (afterTDC is not None) and (position[0]<position[1]):
-            afterTDC = False 
-        elif (afterTDC is not None) and (position[0]>position[1]):
-            afterTDC = True 
-        else:
-            raise ValueError("Could not determine starting point.")
-        
-        start = self.calc_theta_from_position_single(position[0],afterTDC)
-        stop0 = start + 1.9*pi 
-        def f(stop): 
-            steps = np.linspace(start, stop, elms)
-            return np.sum(np.power(position-self.position(steps),2.0))
-        res = minimize(f, stop0)
-        #res = minimize_scalar(f, bounds=boundaries, method='bounded')
+    @abstractmethod
+    def _calc_theta_0_BDC(self): 
+        """Calculate the crankshaft angle at BDC"""
+        def f(x): return -self._calc_distance_to_head(x)
+        res = minimize_scalar(f, bounds=(0.5*pi, 1.5*pi), method='bounded')
         self.autolog(str(res))
-        return np.linspace(start, res.x, elms)
+        return res.x
+    
+    # Some of the functions are written in a way that causes 
+    # indefinite recursion - two functions calling each other 
+    # require a redefinition of at least one of them.      
+    @abstractmethod
+    def _calc_distance_to_head(self,theta_0): 
+        """Calculate the distance from cylinder head to piston pin"""
+        return self._crank_to_head(self._calc_distance_to_shaft(theta_0))
+    
+    @abstractmethod
+    def _calc_distance_to_shaft(self,theta_0): 
+        """Calculate the distance from crankshaft centre to piston pin"""
+        return self._head_to_crank(self._calc_distance_to_head(theta_0))
+    
+    @abstractmethod
+    def _calc_theta_0_from_head(self,distance,TDCtoBDC=None,BDCtoTDC=None,dldtheta=None,dldt=None): 
+        """Calculate the crankshaft angle from the distance between piston pin and head"""
+        return self._calc_theta_0_from_crank(self._head_to_crank(distance),TDCtoBDC=TDCtoBDC,BDCtoTDC=BDCtoTDC,dldtheta=dldtheta,dldt=dldt)
+    
+    @abstractmethod
+    def _calc_theta_0_from_crank(self,distance,TDCtoBDC=None,BDCtoTDC=None,dldtheta=None,dldt=None): 
+        """Calculate the crankshaft angle from the distance between piston pin and crankshaft centre"""
+        return self._calc_theta_0_from_head(self._crank_to_head(distance),TDCtoBDC=TDCtoBDC,BDCtoTDC=BDCtoTDC,dldtheta=dldtheta,dldt=dldt)
+    
+    # Some shorthand notations for further calculations
+    def A(self):
+        """Piston surface facing the control volume [m²]"""
+        return pi * np.power(self.bo,2.0) / 4.0 
+    
+    def V(self,theta):
+        """Volume in cylinder"""
+        return self._calc_distance_to_head(self._calc_theta_0(theta)) * self.A()
 
+    def l(self,theta):
+        """Piston position from TDC + clearance height"""
+        return self._calc_distance_to_head(self._calc_theta_0(theta))
+    
+    def theta(self,position,TDCtoBDC=None,BDCtoTDC=None,dldtheta=None,dldt=None): 
+        return self._calc_theta_0_from_head
+    
+    def dldtheta(self,theta): 
+        """dl/dtheta - derivative of piston position w.r.t. crankshaft angle"""
+        raise NotImplementedError("Missing function")
+    
+    def dldt(self,theta,rpm): 
+        """dl/dt - derivative of piston position w.r.t. time a.k.a. the piston velocity"""
+        return self.dldtheta(theta)*self._calc_dthetadt(rpm)
+    
+    def d2ldtheta2(self,theta): 
+        """d2l/dtheta2 - 2nd derivative of piston position w.r.t. crankshaft angle"""
+        raise NotImplementedError("Missing function")
+    
+    def d2ldt2(self,theta,rpm): 
+        """dl/dt - 2nd derivative of piston position w.r.t. time a.k.a. the piston acceleration"""
+        return self.d2ldtheta2(theta)*np.power(self._calc_dthetadt(rpm),2.0)
+    
+    def dVdtheta(self,theta):
+        """dV/dtheta - derivative of volume w.r.t. crankshaft angle"""
+        return self.dldtheta(theta)*self.A()
+    
+    def d2Vdtheta2(self,theta):
+        """d2V/dtheta2 - 2nd derivative of volume w.r.t. crankshaft angle"""
+        return self.d2ldtheta2(theta)*self.A()
+    
 
     def info(self):        
         table = Texttable()
@@ -172,11 +357,11 @@ class RecipBase(JopyBaseClass):
         table.add_row(["cl", self._cl,"m","conrod length"])
         table.add_row(["bo", self._bo,"m","bore"])
         table.add_row(["pp", self._pp,"m","piston pin offset"])
-        table.add_row(["cv", self._l_tdc*self._A_piston*1e6,"cm3","clearance volume at TDC"])
+        table.add_row(["cv", self.V(self.TDC())*1e6,"cm3","clearance volume at TDC"])
         table.add_row(["TDC", np.degrees(self.TDC()),"deg","angle of piston TDC"])
         table.add_row(["BDC", np.degrees(self.BDC()),"deg","angle of piston BDC"])
-        table.add_row(["Max V", self.volume(self.BDC())*1e6,"cm3","volume at BDC"])
-        table.add_row(["Min V", self.volume(self.TDC())*1e6,"cm3","volume at TDC"])
+        table.add_row(["Max V", self.V(self.BDC())*1e6,"cm3","volume at BDC"])
+        table.add_row(["Min V", self.V(self.TDC())*1e6,"cm3","volume at TDC"])
         print("\n"+table.draw()+"\n")
         
     
@@ -256,40 +441,73 @@ class RecipExplicit(RecipBase):
         super(RecipExplicit, self).set_geometry(cr,cl,bo,pp,cv,of)
         # Dimensionless properties
         self._sigma = pp / cl
-        self._lambda = cr / cl    
-    
-    def _calc_l_cr_max(self):
-        """Calculate the distance from crankshaft to piston at TDC"""
-        return np.sqrt(np.power(self._cl+self._cr,2.0)-np.power(self._pp,2.0))
-
-    def _calc_l_cr_min(self):
-        """Calculate the distance from crankshaft to piston at BDC"""
-        return np.sqrt(np.power(self._cl-self._cr,2.0)-np.power(self._pp,2.0))
-    
+        self._lambda = cr / cl
+        
+        #Carry out some basic comparisons
+        _l_cr_max = np.sqrt(np.power(self.cl+self.cr,2.0)-np.power(self.pp,2.0))
+        _l_cr_min = np.sqrt(np.power(self.cl-self.cr,2.0)-np.power(self.pp,2.0))
+        
+        #if self.l_cr_max <> _l_cr_max:
+        #    raise ValueError("l_cr_max is not equal: {1:7.5f} vs. {1:7.5f}".format(self.l_cr_max,_l_cr_max))
+        #if self.l_cr_min <> _l_cr_min:
+        #    raise ValueError("l_cr_min is not equal: {1:7.5f} vs. {1:7.5f}".format(self.l_cr_min,_l_cr_min))       
+        
+        
+    # Mandatory functions needed to fill the geometry variables
     def _calc_theta_0_TDC(self):
-        """Calculate the crankshaft angle at TDC"""
-        return -np.arcsin(self._pp/(self._cl+self._cr))
+        """Calculate the crankshaft angle at TDC""" 
+        return -np.arcsin(self.pp/(self.cl+self.cr))
 
-    def _calc_theta_0_BDC(self):
+    def _calc_theta_0_BDC(self): 
         """Calculate the crankshaft angle at BDC"""
-        return -np.arcsin(self._pp/(self._cl-self._cr)) + pi 
+        return -np.arcsin(self.pp/(self.cl-self.cr)) + pi
     
-    def _calc_distance_to_shaft(self,_theta_0):
-        """Calculate the distance from crankshaft centre to piston pin"""
-        return self._cl * np.sqrt( 1.0 - np.power(self._lambda*np.sin(_theta_0) + self._sigma, 2.0) ) + self._cr * np.cos(_theta_0)
-    
-    def _calc_distance_to_head(self,_theta_0):
+    # Some of the functions are written in a way that causes 
+    # indefinite recursion - two functions calling each other 
+    # require a redefinition of at least one of them.
+    def _calc_distance_to_head(self,theta_0): 
         """Calculate the distance from cylinder head to piston pin"""
-        return self._l_cr_max-self._calc_distance_to_shaft(_theta_0)+self._l_tdc
+        return super(RecipExplicit, self)._calc_distance_to_head(theta_0)
     
-    def _calc_theta_from_distance_to_shaft(self,_pos_shaft): 
-        raise NotImplementedError("Missing function")
+    def _calc_distance_to_shaft(self,theta_0): 
+        """Calculate the distance from crankshaft centre to piston pin"""
+        def p(x): return np.power(x,2)
+        return self.cl*np.sqrt(1.0 - p(self.cr*np.sin(theta_0) + self.pp)/p(self.cl)) + self.cr*np.cos(theta_0)
     
-    def _calc_theta_from_distance_to_head(self,_pos_head): 
-        raise NotImplementedError("Missing function")
+    def _calc_theta_0_from_head(self,distance,TDCtoBDC=None,BDCtoTDC=None,dldtheta=None,dldt=None): 
+        """Calculate the crankshaft angle from the distance between piston pin and head"""
+        return super(RecipExplicit, self)._calc_theta_0_from_head(distance,TDCtoBDC=TDCtoBDC,BDCtoTDC=BDCtoTDC,dldtheta=dldtheta,dldt=dldt)
     
+    def _calc_theta_0_from_crank(self,distance,TDCtoBDC=None,BDCtoTDC=None,dldtheta=None,dldt=None): 
+        """Calculate the crankshaft angle from the distance between piston pin and crankshaft centre"""
+        def p(x): return np.power(x,2)
+        bounds,do,up = self._calc_theta_bounds(TDCtoBDC, BDCtoTDC, dldtheta, dldt)
+        x = np.empty_like(distance)
+        x[do] = - np.sqrt(self._calc_theta_of_pos_root(distance))
+        x[up] = + np.sqrt(self._calc_theta_of_pos_root(distance))    
+        return -2.0*np.arctan((2.0*self.cr*self.pp + x)/(-p(self.cl) + p(self.cr) + 2.0*self.cr*distance + p(distance) + p(self.pp)))
     
-       
+    def _calc_theta_of_pos_root(self, position):
+        def p(x): return np.power(x,2)
+        return -1.0*(p(self.cl) - 2.0*self.cl*self.cr + p(self.cr) - p(position) - p(self.pp))*(p(self.cl) + 2.0*self.cl*self.cr + p(self.cr) - p(position) - p(self.pp))
+
+    
+    def dldtheta(self,theta): 
+        """dl/dtheta - derivative of piston position w.r.t. crankshaft angle"""
+        def p(x): return np.power(x,2)
+        theta_0 = self._calc_theta_0(theta)
+        dcrankdtheta = -self.cr*np.sin(theta_0) - self.cr*(self.cr*np.sin(theta_0) + self.pp)*np.cos(theta_0)/(self.cl*np.sqrt(1.0 - p(self.cr*np.sin(theta_0) + self.pp)/p(self.cl)))
+        return dcrankdtheta * -1.0 
+    
+    def d2ldtheta2(self,theta): 
+        """d2l/dtheta2 - 2nd derivative of piston position w.r.t. crankshaft angle"""
+        def p(x,y=2.0): return np.power(x,y)
+        theta_0 = self._calc_theta_0(theta)
+        d2crankdtheta2 = -self.cr*np.cos(theta_0) - p(self.cr)*p(np.cos(theta_0))/(self.cl*np.sqrt(1.0 - p(self.cr*np.sin(theta_0) + self.pp)/p(self.cl))) + self.cr*(self.cr*np.sin(theta_0) + self.pp)*np.sin(theta_0)/(self.cl*np.sqrt(1.0 - p(self.cr*np.sin(theta_0) + self.pp)/p(self.cl))) - p(self.cr)*p(self.cr*np.sin(theta_0) + self.pp)*p(np.cos(theta_0))/(p(self.cl,3)*p(1.0 - p(self.cr*np.sin(theta_0) + self.pp)/p(self.cl),3./2.))
+        #d2crankdtheta2 = -cr*cos(theta) - cr**2*cos(theta)**2/(cl*sqrt(1.0 - (cr*sin(theta) + pp)**2/cl**2)) + cr*(cr*sin(theta) + pp)*sin(theta)/(cl*sqrt(1.0 - (cr*sin(theta) + pp)**2/cl**2)) - cr**2*(cr*sin(theta) + pp)**2*cos(theta)**2/(cl**3*(1.0 - (cr*sin(theta) + pp)**2/cl**2)**(3/2))
+        return d2crankdtheta2 * -1.0 
+
+         
 
     
     
@@ -298,43 +516,76 @@ class RecipImplicit(RecipBase):
     minimun and maximun values. Mostly used for testing of the analytical solutions. 
     Definition of piston movement and formulae taken from Dubbel, pages P5 to P7"""
     
+    def set_geometry(self,cr,cl,bo,pp=0,cv=0,of=False):
+        """ 
+        Update the geometric variables and perform some calculations.
+        
+        cr : float
+            crankshaft radius [m]
+        cl : float
+            conrod length [m]
+        bo : float
+            bore [m]
+        pp : float
+            piston pin offset [m]
+        cv : float
+            clearance volume at TDC in [m3]
+        of : float
+            offset for the crank angle position [boolean]
+            Allow for theta_TDC other than 0. If false (theta_TDC = 0)
+            is assured by precalculating the angular offset.
+        """
+        super(RecipImplicit, self).set_geometry(cr,cl,bo,pp,cv,of)
+        
+        #Carry out some basic comparisons
+        _l_max = np.sin(   self.theta_0_TDC+0.5*pi) * (self.cl + self.cr)
+        _l_min = np.cos(pi-self.theta_0_BDC       ) * (self.cl - self.cr)
+        
+        #if self.l_max <> _l_max:
+        #    raise ValueError("l_cr_max is not equal: {1:7.5f} vs. {1:7.5f}".format(self.l_max,_l_max))
+        #if self.l_min <> _l_min:
+        #    raise ValueError("l_cr_min is not equal: {1:7.5f} vs. {1:7.5f}".format(self.l_min,_l_min))   
+    
+    # Custom helper functions
     def _beta(self,_theta_0):
         """Conrod angle"""
         return (self._pp+self._cr*np.sin(_theta_0))/self._cl
-
-    def _calc_l_cr_max(self):
-        """Calculate the distance from crankshaft to piston at TDC"""
-        return np.sin(self._theta_0_TDC+0.5*pi) * (self._cl + self._cr)
-
-    def _calc_l_cr_min(self):
-        """Calculate the distance from crankshaft to piston at BDC"""
-        return np.cos(pi-self._theta_0_BDC) * (self._cl - self._cr)
     
+    # Mandatory functions needed to fill the geometry variables
     def _calc_theta_0_TDC(self):
-        """Calculate the crankshaft angle at TDC"""
-        # SciPy for scalar functions
-        def f(x): return self._calc_distance_to_head(x)
-        res = minimize_scalar(f, bounds=(-0.5*pi, 0.5*pi), method='bounded')
-        self.autolog(str(res))
-        return res.x
+        """Calculate the crankshaft angle at TDC""" 
+        return super(RecipImplicit, self)._calc_theta_0_TDC()
 
-    def _calc_theta_0_BDC(self):
+    def _calc_theta_0_BDC(self): 
         """Calculate the crankshaft angle at BDC"""
-        # SciPy for scalar functions
-        def f(x): return -self._calc_distance_to_head(x)
-        res = minimize_scalar(f, bounds=(0.5*pi, 1.5*pi), method='bounded')
+        return super(RecipImplicit, self)._calc_theta_0_BDC()
+    
+    # Some of the functions are written in a way that causes 
+    # indefinite recursion - two functions calling each other 
+    # require a redefinition of at least one of them.
+    def _calc_distance_to_head(self,theta_0): 
+        """Calculate the distance from cylinder head to piston pin"""
+        return np.sqrt(np.power(self.cl+self.cr,2.0)-np.power(self.pp,2.0))-self.cl*np.cos(self._beta(-theta_0 + pi))+self.cr*np.cos(-theta_0 + pi) + self.l_min
+    
+    def _calc_distance_to_shaft(self,theta_0): 
+        """Calculate the distance from crankshaft centre to piston pin"""
+        def p(x): return np.power(x,2)
+        return self.cl*np.sqrt(1.0 - p(self.cr*np.sin(theta_0) + self.pp)/p(self.cl)) + self.cr*np.cos(theta_0)
+    
+    def _calc_theta_0_from_head(self,distance,TDCtoBDC=None,BDCtoTDC=None,dldtheta=None,dldt=None): 
+        """Calculate the crankshaft angle from the distance between piston pin and head"""
+        bounds,do,up = self._calc_theta_bounds(TDCtoBDC, BDCtoTDC, dldtheta, dldt)
+        pos    = np.asarray(distance)
+        guess  = np.ones_like(pos) * np.mean(bounds)
+        def f(x): return np.sum(np.power(pos-self.l(x),2.0)) 
+        res = minimize(f, guess, bounds=bounds, method='L-BFGS-B')
         self.autolog(str(res))
         return res.x
     
-    def _calc_distance_to_shaft(self,_theta_0):
-        """Calculate the distance from crankshaft centre to piston pin"""
-        return self._l_cr_max - (self._calc_distance_to_head(_theta_0) - self._l_tdc)
+    def _calc_theta_0_from_crank(self,distance,TDCtoBDC=None,BDCtoTDC=None,dldtheta=None,dldt=None): 
+        """Calculate the crankshaft angle from the distance between piston pin and crankshaft centre"""
+        return super(RecipImplicit, self)._calc_theta_0_from_head(distance,TDCtoBDC=TDCtoBDC,BDCtoTDC=BDCtoTDC,dldtheta=dldtheta,dldt=dldt)
     
-    def _calc_distance_to_head(self,_theta_0):
-        """Calculate the distance from cylinder head to piston pin"""
-        return np.sqrt(np.power(self._cl+self._cr,2.0)-np.power(self._pp,2.0))-self._cl*np.cos(self._beta(-_theta_0 + pi))+self._cr*np.cos(-_theta_0 + pi) + self._l_tdc
-
-
    
 
 # class CylinderHetaTransfer(object):
