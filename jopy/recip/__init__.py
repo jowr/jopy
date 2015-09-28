@@ -47,24 +47,30 @@ if __name__ == "__main__":
         diff = (me.V(full)-metoo.V(full))/metoo.V(full)*100.0
         plt.plot(full,diff,label=str(p)+": (Dubbel-Bjarne)/Bjarne")
     plt.legend(loc=3)
+    plt.savefig("recip_vol_dif.pdf")
     
     plt.figure()
     plt.plot(full,me.V(full)*1e6,label='Dubbel')
     plt.plot(full,metoo.V(full)*1e6,label='Bjarne')
     plt.legend(loc=3)
+    plt.savefig("recip_vol.pdf")
     
     plt.figure()
     #plt.plot(full,me.V(full)*1e6,label='Dubbel')
     plt.plot(full,metoo.dVdtheta(full)*1e6,label='Bjarne')
     plt.legend(loc=3)
+    plt.savefig("recip_dvoldtheta.pdf")
     
     plt.figure()
     #plt.plot(full,me.V(full)*1e6,label='Dubbel')
     plt.plot(full,metoo.d2Vdtheta2(full)*1e6,label='Bjarne')
     plt.legend(loc=3)
+    plt.savefig("recip_d2voldtheta2.pdf")
     
     plt.show()
     
     me.info()
     metoo.info()
+    
+    
     
